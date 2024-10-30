@@ -454,7 +454,7 @@ public:
 
     // CONSTRUCTOR: Book File <- addBook();
     Book(const string &textDirectory) {
-        string bookTitle, bookGenre;
+        string bookTitle;
         bool bookAlreadyExists;
         cout << "\n~ adding book...";
 
@@ -469,7 +469,6 @@ public:
                 // Create Book: Book File is Accessable && Book File Doesn't Exist
                 if (openFile) {
                     cout << "\n>> Book created successfully <<";
-                    bookList[make_unique<string>(bookTitle)] = make_unique<string>(bookGenre);
                     break;
                 }
 
@@ -644,6 +643,7 @@ public:
                 // Input Validated Information to Book File
                 inputValidatedInformation(filePath, bookTitle, bookAuthor, bookGenre, bookISBN, bookPublicationDate, bookEdition, bookLanguage, bookContent, bookPageCount);
                 readBookFile(bookTitle);
+                bookList[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
             }
 
             // Error Handling: Accessable File
