@@ -426,7 +426,7 @@ public:
     // Error Handling: Book File Already Exists
     bool alreadyExists(const string &bookTitle) {
         for (const auto&  book : bookList) {
-            if (*book.second == bookTitle) {
+            if (*book.first == bookTitle) {
                 return true;
             }
         }
@@ -675,6 +675,13 @@ public:
         filePath = getFilePath(bookTitle); // Getter
         if (remove(filePath.c_str()) == 0) { // Converts File Path to C-Style String, Removes File Using File Path, Returns 0 or 1
             cout << "\nBook File Deleted!\n\n";
+
+            for (const auto& book : bookList) {
+                if (*book.first == bookTitle) {
+                    bookList.erase(book.first);
+                    break;
+                }
+            }
         }
 
         else {
@@ -691,6 +698,50 @@ public:
         for (const auto& book : bookList) {
             cout << "\n" << counter << ". " << *book.first << " [" << *book.second << "]";
             counter++;
+        }
+    }
+
+    // >> Borrow Book [6]
+    void borrowBook() {
+        cout << "\n~ borrowing book...";
+        string bookTitle;
+        bool bookAlreadyExists = false;
+        do { // Error Loop
+            // Prompt
+            cout << "\nBook Title: ";
+            getline(cin, bookTitle);
+
+            if (bookTitle.empty()) {
+                cerr << "\nERROR | blank_book_title";
+            }
+
+        } while (bookTitle.empty());
+
+        if (bookAlreadyExists) {
+            string currentPath = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
+            string borrowedBookFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\borrowed_books\\" + bookTitle + ".txt";
+
+            /*for (const auto& borrow : borrowHistory) {
+                if (*borrow.first == bookTitle) {
+                    bookAlreadyExists = true;
+                    break;
+                }
+            }
+            //map<unique_ptr<string>, unique_ptr<Member>> borrowHistory;*/
+
+            // Error Handling:
+            if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
+                cerr << "\nERROR | could_not_move_file";
+            }
+
+            else {
+                cout << "\nSuccessfully borrowed: " << bookTitle;
+            }
+        }
+
+        // Erorr Handling: bookExists
+        else {
+            cerr << "\nERROR | book_does_not_exist";
         }
     }
 };
@@ -742,7 +793,7 @@ public:
                 libraryReference.showBookList();
                 break;
             case 6:
-                //borrowBook();
+                libraryReference.borrowBook();
                 break;
             case 7:
                 // returnBook();//printBorrowHistory();
