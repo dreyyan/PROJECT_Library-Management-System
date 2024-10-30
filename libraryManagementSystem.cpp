@@ -33,7 +33,7 @@ public:
 
 // Standard Template Library[STL] Containers
 map<unique_ptr<string>, unique_ptr<string>> bookList;
-map<unique_ptr<string>, unique_ptr<Member>> borrowHistory;
+map<unique_ptr<string>, unique_ptr<string>> borrowHistory;
 vector<unique_ptr<string>> returnHistory;
 
 class Book { // Book Class
@@ -726,8 +726,8 @@ public:
                     bookAlreadyExists = true;
                     break;
                 }
-            }
-            //map<unique_ptr<string>, unique_ptr<Member>> borrowHistory;*/
+            }*/
+            //map<unique_ptr<string>, unique_ptr<string>> borrowHistory;
 
             // Error Handling:
             if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
@@ -746,19 +746,282 @@ public:
     }
 };
 
-class Menu { // Menu Class: Recursive
+class Menu {
+// Menu Class: Recursive
 protected:
     Library &libraryReference;
-
+    map<string, string> loginCredentials;
 public:
     Menu(Library &libraryReference) : libraryReference(libraryReference) { /* Menu Constructor */ }
 
+    void displayRegisterMenu() {
+        string username, password;
+        bool isRegisteredUsername, isValidUsername, isValidPassword, onRegisterMenu;
+        bool hasLetter, hasNumber;
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-_-[REGISTER]-_-_-_-_-";
+        do { // Error Loop
+            isRegisteredUsername = false, isValidUsername = true, hasLetter = false, hasNumber = false, onRegisterMenu = true;
+            // Prompt
+            cout << "\n[ Character Length: min. 5 / max. 15 | a-z, 1-3 | No Spaces ]";
+            cout << "\nUsername: ";
+            getline(cin, username);
+
+            // Error Handling: isEmpty
+            if (username.empty() || username[0] == ' ') {
+                isValidUsername = false;
+                cerr << "\nERROR | blank_username_input";
+            }
+
+            // Error Handling: validLength
+            if (username.length() < 5 || username.length() > 15) {
+                isValidUsername = false;
+                if (username.length() < 5) {
+                    cerr << "\nERROR | under_minimum_username_length";
+                }
+
+                else {
+                    cerr << "\nERROR | exceeded_maximum_username_length";
+                }
+            }
+
+            // Error Handling: isSpace
+            for (size_t i = 0; i < username.length(); i++) {
+                if (isspace(username[i])) {
+                    isValidUsername = false;
+                    cerr << "\nERROR | username_must_not_contain_spaces";
+                    break;
+                }
+
+                // Counter: isLetter
+                if (isalpha(username[i])) {
+                    hasLetter = true;
+                }
+
+                // Counter: isNumber
+                if (isdigit(username[i])) {
+                    hasNumber = true;
+                }
+
+                // Error Handling: isCharacter
+                if (!isalnum(username[i])) {
+                    isValidUsername = false;
+                    cerr << "\nERROR | username_must_not_contain_characters";
+                    break;
+                }
+            }
+
+            // Error Handling: noLetters
+            if (!hasLetter) {
+                isValidUsername = false;
+                cerr << "\nERROR | username_must_contain_a_letter";
+            }
+
+            // Error Handling: noNumbers
+            if (!hasNumber) {
+                isValidUsername = false;
+                cerr << "\nERROR | username_must_contain_a_number";
+            }
+
+            // Error Handling: isNotExisting
+            for (const auto& existingUsername : loginCredentials) {
+                if (existingUsername.first == username) {
+                    isRegisteredUsername = true;
+                    cerr << "\nERROR | username_already_registered";
+                    break;
+                }
+            }
+
+        } while (!isValidUsername);
+        cout << "\nUsername is valid.";
+
+        do { // Error Loop
+            isValidPassword = true, hasLetter = false, hasNumber = false;
+            // Prompt
+            cout << "\n[ Character Length: min. 5 / max. 15 | a-z, 1-3 | No Spaces ]";
+            cout << "\nPassword: ";
+            getline(cin, password);
+
+            // Error Handling: isEmpty
+            if (password.empty() || password[0] == ' ') {
+                isValidPassword = false;
+                cerr << "\nERROR | blank_password_input";
+            }
+
+            // Error Handling: validLength
+            if (password.length() < 5 || password.length() > 15) {
+                isValidPassword = false;
+                if (password.length() < 5) {
+                    cerr << "\nERROR | under_minimum_password_length";
+                }
+
+                else {
+                    cerr << "\nERROR | exceeded_maximum_password_length";
+                }
+            }
+
+            // Error Handling: isSpace
+            for (size_t i = 0; i < password.length(); i++) {
+                if (isspace(password[i])) {
+                    isValidPassword = false;
+                    cerr << "\nERROR | password_must_not_contain_spaces";
+                    break;
+                }
+
+                // Counter: isLetter
+                if (isalpha(password[i])) {
+                    hasLetter = true;
+                }
+
+                // Counter: isNumber
+                if (isdigit(password[i])) {
+                    hasNumber = true;
+                }
+
+                // Error Handling: isCharacter
+                if (!isalnum(password[i])) {
+                    isValidPassword = false;
+                    cerr << "\nERROR | password_must_not_contain_characters";
+                    break;
+                }
+            }
+
+            // Error Handling: noLetters
+            if (!hasLetter) {
+                isValidPassword = false;
+                cerr << "\nERROR | password_must_contain_a_letter";
+            }
+
+            // Error Handling: noNumbers
+            if (!hasNumber) {
+                isValidPassword = false;
+                cerr << "\nERROR | password_must_contain_a_number";
+            }
+
+        } while (!isValidPassword);
+
+        // Register Using Login Credentials
+        loginCredentials[username] = password;
+
+        cout << "\nuser '" << username << "' registered successfully!";
+        int registerMenuChoice;
+
+        do {
+            cout << "\n| -Library-Management-System- |";
+            cout << "\n-_-_-_-_-_-[REGISTER]-_-_-_-_-";
+            cout << "\n------------------------";
+            cout << "\nProceed to Login Page?";
+            cout << "\n[1] | Yes";
+            cout << "\n[2] | No";
+            cout << "\n------------------------";
+            cout << "\n>> ";
+            cin >> registerMenuChoice;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            if (registerMenuChoice == 1) {
+                onRegisterMenu = false;
+                displayLoginMenu();
+            }
+
+            else if (registerMenuChoice == 2) {
+                onRegisterMenu = false;
+                displayMenu();
+            }
+
+        } while (onRegisterMenu);
+    }
+
+    void displayLoginMenu() {
+        string username, password;
+        bool usernameExists, correctPassword;
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-_-_-[LOGIN]-_-_-_-_-_-";
+        do {
+            // Error Loop
+            usernameExists = false;
+            // Prompt
+            cout << "\nUsername: ";
+            getline(cin, username);
+
+            // Input Handling: usernameExists
+            for (const auto& existingUsername : loginCredentials) {
+                if (existingUsername.first == username) {
+                    usernameExists = true;
+                    break;
+                }
+            }
+
+            // Error Handling: noExistingUsername
+            if (!usernameExists) {
+                cerr << "\nERROR | username_does_not_exist";
+            }
+
+        } while (!usernameExists);
+
+        do { // Error Loop
+            correctPassword = false;
+            // Prompt
+            cout << "\nPassword: ";
+            getline(cin, password);
+
+            // Input Handling: correctPassword
+            if (loginCredentials[username] == password) {
+                correctPassword = true;
+            }
+
+            // Error Handling: invalidPassword
+            else {
+                cerr << "\nERROR | invalid_password";
+            }
+
+        } while (!correctPassword);
+        cout << "\nLogin Successful!";
+        displayLibraryMenu();
+    }
+
+    void displayMenu() {
+        int loginMenuChoice;
+        do {
+            cout << "\n| -Library-Management-System- |";
+            cout << "\n-_-_-_-_-_-_-[MENU]-_-_-_-_-_-";
+            cout << "\n---------------";
+            cout << "\n[1] | Login";
+            cout << "\n[2] | Register";
+            cout << "\n[3] | Exit";
+            cout << "\n---------------";
+            cout << "\n>> ";
+            cin >> loginMenuChoice;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            switch(loginMenuChoice) {
+                case 1:
+                    displayLoginMenu();
+                break;
+                case 2:
+                    displayRegisterMenu();
+                break;
+                case 3:
+                    cout << "\nexiting program...";
+                    exit(0);
+                break;
+                default:
+                    cerr << "Invalid Input. Please try again.";
+                break;
+            }
+
+        } while(true);
+    }
+
     /* MENU */
     // MENU: Display
-    void displayMenu() {
+    void displayLibraryMenu() {
         int choice;
         do {
-            cout << "\n| LIBRARY MANAGEMENT SYSTEM |";
+            cout << "\n| -Library-Management-System- |";
+            cout << "\n-_-_-_-_-_-[LIBRARY]-_-_-_-_-";
+            cout << "\n---------------------------";
             cout << "\n[1] | Create Book";
             cout << "\n[2] | Update Book Information";
             cout << "\n[3] | Read Book";
@@ -769,9 +1032,9 @@ public:
             cout << "\n[8] | Search Book";
             cout << "\n[9] | Borrow History";
             cout << "\n[10] | Return History";
-            cout << "\n[11] | Register User";
-            cout << "\n[12] | Exit";
-            cout << "\n-> ";
+            cout << "\n[11] | Exit";
+            cout << "\n---------------------------";
+            cout << "\n>> ";
             cin >> choice;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -808,11 +1071,8 @@ public:
                 // searchBook();//printReturnHistory();
                 break;
             case 11:
-                // searchBook();//printReturnHistory();
+                displayMenu();
                 break;
-            case 12:
-                cout << "\nProgram Exited.";
-                return;
             default:
                 cout << "\nInvalid Input. Please try again.";
                 break;
@@ -846,6 +1106,6 @@ int main() {
     Book book; // Default Book Constructor for Library
     Library library(book); // Library Constructor for Menu
     unique_ptr<Menu> startProgram = make_unique<Menu>(library); // Function Wrapper: Smart Pointer -> Function
-    startProgram->displayMenu(); // Start the Prgoram
+    startProgram->displayMenu(); // Start Prgoram
     return 0;
 }
