@@ -13,6 +13,10 @@
 #include <vector>
 using namespace std;
 
+// Current Time
+time_t seconds = time(NULL);
+struct tm timeFormat = *localtime(&seconds);
+
 class User { // Base Class [User]
 protected:
     unique_ptr<string> name, age, contactNumber;
@@ -32,9 +36,10 @@ public:
 };
 
 // Standard Template Library[STL] Containers
+map<string, string> loginCredentials;
 map<unique_ptr<string>, unique_ptr<string>> bookList;
 map<unique_ptr<string>, unique_ptr<string>> borrowHistory;
-vector<unique_ptr<string>> returnHistory;
+map<unique_ptr<string>, unique_ptr<string>> returnHistory;
 
 class Book { // Book Class
 protected:
@@ -456,7 +461,8 @@ public:
     Book(const string &textDirectory) {
         string bookTitle;
         bool bookAlreadyExists;
-        cout << "\n~ adding book...";
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-_-[ADD BOOK]-_-_-_-_-";
 
         // Prompt Book Title as File Name
         do {
@@ -571,7 +577,15 @@ public:
     void readBook() {
         string bookTitle, line;
         bool fileFound = true;
-        cout << "\n~ reading book...";
+
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-_-[READ BOOK]-_-_-_-_-";
+        // Loop Iteration: Display
+        size_t counter = 1;
+        for (const auto& book : bookList) {
+            cout << "\n" << counter << ". " << *book.first << " [" << *book.second << "]";
+            counter++;
+        }
 
         do { // Error Loop
             // Prompt
@@ -617,8 +631,9 @@ public:
         // Book File Variables
         string bookAuthor, bookGenre, bookISBN, bookPublicationDate, bookLanguage, bookContent, bookEdition;
         unsigned int bookPageCount, bookBorrowCount = 0, bookAvailability = true;
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n -_-_-[UPDATE BOOK INFO]-_-_-";
 
-        cout << "\n~ updating book info...";
         do { // Error Loop
             // Prompt
             cout << "\nSearch Book | Title: ";
@@ -658,7 +673,15 @@ public:
     void deleteBook() {
         string bookTitle;
         string filePath = getFilePath(bookTitle);
-        cout << "\n~ deleting book...";
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-[DELETE BOOK]-_-_-_-_-";
+
+        // Loop Iteration: Display
+        size_t counter = 1;
+        for (const auto& book : bookList) {
+            cout << "\n" << counter << ". " << *book.first << " [" << *book.second << "]";
+            counter++;
+        }
 
         do { // Error Loop
             // Prompt
@@ -691,7 +714,8 @@ public:
 
     // >> Show Booklist [5]
     void showBookList() {
-        cout << "\n~ showing book list...";
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n -_-_-_-_-[BOOK LIST]-_-_-_-_-";
 
         // Loop Iteration: Display
         size_t counter = 1;
@@ -703,9 +727,18 @@ public:
 
     // >> Borrow Book [6]
     void borrowBook() {
-        cout << "\n~ borrowing book...";
         string bookTitle;
-        bool bookAlreadyExists = false;
+        bool bookExists = false, bookAlreadyBorrowed = false;
+
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-[BORROW BOOK]-_-_-_-_-";
+        // Loop Iteration: Display
+        size_t counter = 1;
+        for (const auto& book : bookList) {
+            cout << "\n" << counter << ". " << *book.first << " [" << *book.second << "]";
+            counter++;
+        }
+
         do { // Error Loop
             // Prompt
             cout << "\nBook Title: ";
@@ -717,31 +750,225 @@ public:
 
         } while (bookTitle.empty());
 
-        if (bookAlreadyExists) {
-            string currentPath = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
-            string borrowedBookFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\borrowed_books\\" + bookTitle + ".txt";
-
-            /*for (const auto& borrow : borrowHistory) {
-                if (*borrow.first == bookTitle) {
-                    bookAlreadyExists = true;
-                    break;
-                }
-            }*/
-            //map<unique_ptr<string>, unique_ptr<string>> borrowHistory;
-
-            // Error Handling:
-            if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
-                cerr << "\nERROR | could_not_move_file";
-            }
-
-            else {
-                cout << "\nSuccessfully borrowed: " << bookTitle;
+        // Loop Handling: bookExists
+        for (const auto& book : bookList) {
+            if (*book.first == bookTitle) {
+                bookExists = true;
+                break;
             }
         }
 
-        // Erorr Handling: bookExists
-        else {
+        if (!bookExists) {
             cerr << "\nERROR | book_does_not_exist";
+            return;
+        }
+
+        // Loop Handling: isAlreadyBorrowed
+        for (const auto& borrow : borrowHistory) {
+            if (*(borrow.first) == bookTitle) {
+                bookAlreadyBorrowed = true;
+                break;
+            }
+        }
+
+        if (bookAlreadyBorrowed) {
+            cerr << "\nERROR | book_already_borrowed";
+            return;
+        }
+
+        // Directories
+        string currentPath = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
+        string borrowedBookFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\borrowed_books\\" + bookTitle + ".txt";
+
+            // Error Handling: immovableFile
+        if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
+            cerr << "\nERROR | could_not_move_file";
+        }
+
+        else {
+            cout << "\nSuccessfully borrowed: " << bookTitle;
+            borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>("<borrowed>");
+        }
+    }
+
+    // >> Return Book [7]
+    void returnBook() {
+        string bookTitle;
+        bool bookExists, bookAlreadyReturned;
+
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-[RETURN BOOK]-_-_-_-_-";
+
+        do { // Error Loop
+            bookExists = false;
+            bookAlreadyReturned = false;
+            // Prompt
+            cout << "\nBook Title: ";
+            getline(cin, bookTitle);
+
+            if (bookTitle.empty()) {
+                cerr << "\nERROR | blank_book_title";
+            }
+
+        } while (bookTitle.empty());
+
+        // Loop Handling: bookExists
+        for (const auto& book : bookList) {
+            if (*book.first == bookTitle) {
+                bookExists = true;
+                break;
+            }
+        }
+
+        // Error Handling: fileDoesNotExist
+        if (!bookExists) {
+            cerr << "\nERROR | book_does_not_exist";
+            return;
+        }
+
+        // Loop Handling: isAlreadReturned
+        for (const auto& returned : returnHistory) {
+            if (*(returned.first) == bookTitle) {
+                bookAlreadyReturned = true;
+                break;
+            }
+        }
+
+        if (bookAlreadyReturned) {
+            cerr << "\nERROR | book_already_returned";
+            return;
+        }
+
+        // Directories
+        string currentPath = "C:\\CC202_LibraryManagementSystem\\txt_files\\borrowed_books\\" + bookTitle + ".txt";
+        string borrowedBookFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
+
+        // Error Handling: immovableFile
+        if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
+            cerr << "\nERROR | could_not_move_file";
+        }
+
+        else {
+            cout << "\nSuccessfully returned: " << bookTitle;
+            returnHistory[make_unique<string>(bookTitle)] = make_unique<string>("<returned>");
+        }
+
+        // Loop Iteration: Display
+        size_t counter = 1;
+        for (const auto& book : bookList) {
+            cout << "\n" << counter << ". " << *book.first << " [" << *book.second << "]";
+            counter++;
+        }
+    }
+
+    // >> Search Book [8]
+    void searchBook() {
+        string bookTitle;
+        bool bookExists;
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-[SEARCH BOOK]-_-_-_-_-";
+        // Loop Iteration: Display
+        size_t counter = 1;
+        for (const auto& book : bookList) {
+            cout << "\n" << counter << ". " << *book.first << " [" << *book.second << "]";
+            counter++;
+        }
+
+        do {
+            bookExists = false;
+            // Prompt
+            cout << "\nSearch Book | Book Title: ";
+            getline(cin, bookTitle);
+
+            // Error Handling: isEmpty
+            if (bookTitle.empty() || bookTitle[0] == ' ') {
+                cerr << "\nERROR | blank_book_title_input";
+            }
+
+        } while (bookTitle.empty() || bookTitle[0] == ' ');
+
+        // Loop Handling: bookExists
+        for (const auto& book : bookList) {
+            if (*book.first == bookTitle) {
+                bookExists = true;
+
+                if (bookExists) {
+                    int choice;
+                    cout << "\nBook '" << bookTitle << "' found!" << " >> ISBN[" << *book.second << "]";
+
+                    do {
+                        cout << "\nShow Contents?: ";
+                        cout << "\n[1] | Yes";
+                        cout << "\n[2] | No";
+                        cout << "\n---------";
+                        cout << "\n>> ";
+                        cin >> choice;
+
+                        if (cin.fail()) {
+                            cin.clear();
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            cerr << "\nERROR | invalid_input";
+                        }
+                    } while (cin.fail());
+
+                    if (choice == 1) {
+                        string line;
+                        string filePath = getFilePath(bookTitle); // Getter
+                        ifstream bookFileReader(filePath); // Create Book File
+
+                        // Read File: Accessable File
+                        if (bookFileReader) {
+                            cout << "\nFile Name: " << bookTitle << ".txt";
+                            cout << "\n-------------------------CONTENT-------------------------|\n";
+
+                            while (getline(bookFileReader, line)) {
+                                cout << line << "\n";
+                            }
+
+                            cout << "---------------------------------------------------------|\n";
+                            bookFileReader.close();
+                        }
+
+                        // Error Handling: Accessable File
+                        else {
+                            cerr << "\nERROR | inaccessible_book_file";
+                        }
+                    }
+
+                    // Break Loop
+                    else if (choice == 2) {
+                        cout << "\nfinishing search...";
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // >> Print Borrow History [9]
+    void printBorrowHistory() {
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-[BORROW HISTORY]-_-_-_-";
+
+        // Loop Handling: Print Borrow History
+        for (const auto& bHistory : borrowHistory) {
+            cout << "\n* " << *bHistory.first << "[" << *bHistory.second << "] borrowed | "
+            << timeFormat.tm_mon + 1 << "/" << timeFormat.tm_mday << "/" << timeFormat.tm_year + 1900;
+        }
+    }
+
+    /*time_t seconds = time(NULL);
+    struct tm timeFormat = *localtime(&seconds);*/
+
+    // >> Print Return History [9]
+    void printReturnHistory() {
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-[RETURN HISTORY]-_-_-_-";
+
+        // Loop Handling: Print Return History
+        for (const auto& rHistory : returnHistory) {
+            cout << "\n* " << *rHistory.first << "[" << *rHistory.second << "] returned | "
+            << timeFormat.tm_mon + 1 << "/" << timeFormat.tm_mday << "/" << timeFormat.tm_year + 1900;
         }
     }
 };
@@ -750,7 +977,6 @@ class Menu {
 // Menu Class: Recursive
 protected:
     Library &libraryReference;
-    map<string, string> loginCredentials;
 public:
     Menu(Library &libraryReference) : libraryReference(libraryReference) { /* Menu Constructor */ }
 
@@ -833,7 +1059,6 @@ public:
             }
 
         } while (!isValidUsername);
-        cout << "\nUsername is valid.";
 
         do { // Error Loop
             isValidPassword = true, hasLetter = false, hasNumber = false;
@@ -1059,16 +1284,16 @@ public:
                 libraryReference.borrowBook();
                 break;
             case 7:
-                // returnBook();//printBorrowHistory();
+                libraryReference.returnBook();
                 break;
             case 8:
-                // searchBook();//printReturnHistory();
+                libraryReference.searchBook();
                 break;
             case 9:
-                // searchBook();//printReturnHistory();
+                libraryReference.printBorrowHistory();
                 break;
             case 10:
-                // searchBook();//printReturnHistory();
+                libraryReference.printReturnHistory();
                 break;
             case 11:
                 displayMenu();
