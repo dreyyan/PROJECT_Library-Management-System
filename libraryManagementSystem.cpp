@@ -550,7 +550,7 @@ public:
     void readBookFile(const string &bookTitle) {
         cout << "\n>> reading book file...";
         string line, filePath = getFilePath(bookTitle); // Getter
-        ifstream bookFileReader(filePath); // Create Book File
+        ifstream bookFileReader(filePath); // File Reader
 
 
         // Read Text File: Accessable File
@@ -573,57 +573,8 @@ public:
         Book("C:\\CC202_LibraryManagementSystem\\txt_files");
     }
 
-    // >> [R]EAD Book [2]
-    void readBook() {
-        string bookTitle, line;
-        bool fileFound = true;
-
-        cout << "\n| -Library-Management-System- |";
-        cout << "\n-_-_-_-_-_-[READ BOOK]-_-_-_-_-";
-        // Loop Iteration: Display
-        size_t counter = 1;
-        for (const auto& book : bookList) {
-            cout << "\n" << counter << ". " << *book.first << " [" << *book.second << "]";
-            counter++;
-        }
-
-        do { // Error Loop
-            // Prompt
-            cout << "\nBook Title: ";
-            getline(cin, bookTitle);
-
-            // Error Handling: isEmpty
-            if (bookTitle.empty() || isspace(bookTitle[0])) {
-                cerr << "\nERROR | blank_book_title_input";
-            }
-
-        } while (bookTitle.empty() || isspace(bookTitle[0]));
-
-        string filePath = getFilePath(bookTitle); // Getter
-        ifstream bookFileReader(filePath); // Create Book File
-
-        // Read File: Accessable File
-        if (bookFileReader) {
-            cout << "\nBook File Found!\n\n";
-            cout << "\nFile Name: " << bookTitle << ".txt";
-            cout << "\n-------------------------CONTENT-------------------------|\n";
-
-            while (getline(bookFileReader, line)) {
-                cout << line << "\n";
-            }
-
-            cout << "---------------------------------------------------------|\n";
-            bookFileReader.close();
-        }
-
-        // Error Handling: Accessable File
-        else {
-            cerr << "\nERROR | inaccessible_book_file";
-        }
-    }
-
-    // >> [U]PDATE Book [3]
-    void updateBook() {
+    // >> Input Book Information [2]
+    void inputBookInformation() {
         // Book Search Variables
         string bookTitle;
         bool fileFound;
@@ -669,7 +620,127 @@ public:
         } while (bookTitle.empty() || isspace(bookTitle[0]) || !fileFound);
     }
 
-    // >> [D]ELETE Book [4]
+    // >> [U]PDATE Book Information [3]
+    void updateBookInformation() {
+        string bookTitle;
+        vector<string> currentLines;
+        string line;
+        int lineNumber;
+
+        do { // Error Loop
+            // Prompt
+            cout << "\nBook Title: ";
+            getline(cin, bookTitle);
+
+            // Error Handling: isEmpty
+            if (bookTitle.empty() || isspace(bookTitle[0])) {
+                cerr << "\nERROR | blank_book_title_input";
+            }
+
+        } while (bookTitle.empty() || isspace(bookTitle[0]));
+
+        string filePath = getFilePath(bookTitle); // Getter
+        ifstream bookFileReader(filePath); // File Reader
+
+        // Display Current Content
+        if (bookFileReader) {
+            cout << "\nBook File Found!\n\n";
+            cout << "File Name: " << bookTitle << ".txt";
+            cout << "\n-------------------------CONTENT-------------------------\n";
+
+
+        while (getline(bookFileReader, line)) {
+            currentLines.push_back(line);
+            cout << currentLines.size() << " | " << line << "\n"; // Print Line Number
+        }
+            bookFileReader.close();
+            cout << "---------------------------------------------------------\n";
+
+        do { // Error Loop
+            // Prompt
+            cout << "\nChange Line No. (1 - " << currentLines.size() << "): ";
+            cin >> lineNumber;
+
+            // Error Handling: invalidInput
+            if (cin.fail() || lineNumber < 1 || lineNumber > currentLines.size()) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cerr << "\nERROR | invalid_line_number_input\n";
+            }
+        } while (cin.fail() || lineNumber < 1 || lineNumber > currentLines.size());
+
+            // Prompt New Content
+            cout << "\nCurrent Content: " << currentLines[lineNumber - 1];
+            cin.ignore();
+            cout << "\nChange Content(Line " << lineNumber << "): ";
+            getline(cin, currentLines[lineNumber - 1]);
+
+            // Change Content
+            ofstream bookFileWriter(filePath);
+            for (const auto& modifiedLine : currentLines) {
+                bookFileWriter << modifiedLine << "\n";
+            }
+
+            // Close Book
+            bookFileWriter.close();
+            cout << "\nLine " << lineNumber << " updated successfully!";
+        }
+
+        else {
+            cerr << "\nERROR | cannot_open_file ";
+        }
+    }
+
+    // >> [R]EAD Book [4]
+    void readBook() {
+        string bookTitle, line;
+        bool fileFound = true;
+
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-_-[READ BOOK]-_-_-_-_-";
+        // Loop Iteration: Display
+        size_t counter = 1;
+        for (const auto& book : bookList) {
+            cout << "\n" << counter << ". " << *book.first << " [" << *book.second << "]";
+            counter++;
+        }
+
+        do { // Error Loop
+            // Prompt
+            cout << "\nBook Title: ";
+            getline(cin, bookTitle);
+
+            // Error Handling: isEmpty
+            if (bookTitle.empty() || isspace(bookTitle[0])) {
+                cerr << "\nERROR | blank_book_title_input";
+            }
+
+        } while (bookTitle.empty() || isspace(bookTitle[0]));
+
+        string filePath = getFilePath(bookTitle); // Getter
+        ifstream bookFileReader(filePath);
+
+        // Read File: Accessable File
+        if (bookFileReader) {
+            cout << "\nBook File Found!\n\n";
+            cout << "\nFile Name: " << bookTitle << ".txt";
+            cout << "\n-------------------------CONTENT-------------------------|\n";
+
+            while (getline(bookFileReader, line)) {
+                cout << line << "\n";
+            }
+
+            cout << "---------------------------------------------------------|\n";
+            bookFileReader.close();
+        }
+
+        // Error Handling: Accessable File
+        else {
+            cerr << "\nERROR | inaccessible_book_file";
+        }
+    }
+
+    // >> [D]ELETE Book [5]
     void deleteBook() {
         string bookTitle;
         string filePath = getFilePath(bookTitle);
@@ -712,7 +783,7 @@ public:
         }
     }
 
-    // >> Show Booklist [5]
+    // >> Show Booklist [6]
     void showBookList() {
         cout << "\n| -Library-Management-System- |";
         cout << "\n -_-_-_-_-[BOOK LIST]-_-_-_-_-";
@@ -725,9 +796,9 @@ public:
         }
     }
 
-    // >> Borrow Book [6]
+    // >> Borrow Book [7]
     void borrowBook() {
-        string bookTitle;
+        string bookTitle, bookISBN;
         bool bookExists = false, bookAlreadyBorrowed = false;
 
         cout << "\n| -Library-Management-System- |";
@@ -753,6 +824,7 @@ public:
         // Loop Handling: bookExists
         for (const auto& book : bookList) {
             if (*book.first == bookTitle) {
+                bookISBN = *book.second;
                 bookExists = true;
                 break;
             }
@@ -787,13 +859,13 @@ public:
 
         else {
             cout << "\nSuccessfully borrowed: " << bookTitle;
-            borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>("<borrowed>");
+            borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
         }
     }
 
-    // >> Return Book [7]
+    // >> Return Book [8]
     void returnBook() {
-        string bookTitle;
+        string bookTitle, bookISBN;
         bool bookExists, bookAlreadyReturned;
 
         cout << "\n| -Library-Management-System- |";
@@ -816,6 +888,7 @@ public:
         for (const auto& book : bookList) {
             if (*book.first == bookTitle) {
                 bookExists = true;
+                bookISBN = *book.second;
                 break;
             }
         }
@@ -850,7 +923,7 @@ public:
 
         else {
             cout << "\nSuccessfully returned: " << bookTitle;
-            returnHistory[make_unique<string>(bookTitle)] = make_unique<string>("<returned>");
+            returnHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
         }
 
         // Loop Iteration: Display
@@ -861,7 +934,7 @@ public:
         }
     }
 
-    // >> Search Book [8]
+    // >> Search Book [9]
     void searchBook() {
         string bookTitle;
         bool bookExists;
@@ -945,7 +1018,7 @@ public:
         }
     }
 
-    // >> Print Borrow History [9]
+    // >> Print Borrow History [10]
     void printBorrowHistory() {
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-[BORROW HISTORY]-_-_-_-";
@@ -960,7 +1033,7 @@ public:
     /*time_t seconds = time(NULL);
     struct tm timeFormat = *localtime(&seconds);*/
 
-    // >> Print Return History [9]
+    // >> Print Return History [11]
     void printReturnHistory() {
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-[RETURN HISTORY]-_-_-_-";
@@ -1248,16 +1321,17 @@ public:
             cout << "\n-_-_-_-_-_-[LIBRARY]-_-_-_-_-";
             cout << "\n---------------------------";
             cout << "\n[1] | Create Book";
-            cout << "\n[2] | Update Book Information";
-            cout << "\n[3] | Read Book";
-            cout << "\n[4] | Delete Book";
-            cout << "\n[5] | Show Booklist";
-            cout << "\n[6] | Borrow Book";
-            cout << "\n[7] | Return Book";
-            cout << "\n[8] | Search Book";
-            cout << "\n[9] | Borrow History";
-            cout << "\n[10] | Return History";
-            cout << "\n[11] | Exit";
+            cout << "\n[2] | Input Book Information";
+            cout << "\n[3] | Update Information";
+            cout << "\n[4] | Read Book";
+            cout << "\n[5] | Delete Book";
+            cout << "\n[6] | Show Booklist";
+            cout << "\n[7] | Borrow Book";
+            cout << "\n[8] | Return Book";
+            cout << "\n[9] | Search Book";
+            cout << "\n[10] | Borrow History";
+            cout << "\n[11] | Return History";
+            cout << "\n[12] | Exit";
             cout << "\n---------------------------";
             cout << "\n>> ";
             cin >> choice;
@@ -1269,33 +1343,36 @@ public:
                 libraryReference.createBook();
                 break;
             case 2:
-                libraryReference.updateBook();
+                libraryReference.inputBookInformation();
                 break;
             case 3:
-                libraryReference.readBook();
+                libraryReference.updateBookInformation();
                 break;
             case 4:
-                libraryReference.deleteBook();
+                libraryReference.readBook();
                 break;
             case 5:
-                libraryReference.showBookList();
+                libraryReference.deleteBook();
                 break;
             case 6:
-                libraryReference.borrowBook();
+                libraryReference.showBookList();
                 break;
             case 7:
-                libraryReference.returnBook();
+                libraryReference.borrowBook();
                 break;
             case 8:
-                libraryReference.searchBook();
+                libraryReference.returnBook();
                 break;
             case 9:
-                libraryReference.printBorrowHistory();
+                libraryReference.searchBook();
                 break;
             case 10:
-                libraryReference.printReturnHistory();
+                libraryReference.printBorrowHistory();
                 break;
             case 11:
+                libraryReference.printReturnHistory();
+                break;
+            case 12:
                 displayMenu();
                 break;
             default:
@@ -1331,6 +1408,7 @@ int main() {
     Book book; // Default Book Constructor for Library
     Library library(book); // Library Constructor for Menu
     unique_ptr<Menu> startProgram = make_unique<Menu>(library); // Function Wrapper: Smart Pointer -> Function
-    startProgram->displayMenu(); // Start Prgoram
+    /*startProgram->displayMenu(); // Start Prgoram*/
+    startProgram->displayLibraryMenu();
     return 0;
 }
