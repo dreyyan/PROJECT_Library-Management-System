@@ -1403,6 +1403,7 @@ public:
             << "\n"
             << "11. printReturnHistory()\n"
             << "   - prints transcript of return_history from start to current, formatted along with return date\n"
+            << "\n"
             << ">> /exit\n"
             << "   - exits the loop validation\n";
     }
