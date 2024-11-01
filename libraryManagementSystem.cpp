@@ -1404,8 +1404,7 @@ public:
             << "11. printReturnHistory()\n"
             << "   - prints transcript of return_history from start to current, formatted along with return date\n"
             << ">> /exit\n"
-            << "\n"
-               "   - exits the loop validation\n";
+            << "   - exits the loop validation\n";
     }
 };
 
@@ -1721,8 +1720,8 @@ public:
             cout << "\n[11] | Return History";
             cout << "\n[12] | Table of Contents";
             cout << "\n[13] | Exit";
+            cout << "\n['/exit' to Exit Function Validations ]";
             cout << "\n---------------------------";
-            cout << "\n['/exit' to Exit Validation]";
             cout << "\n>> ";
             cin >> choice;
             cin.clear();
