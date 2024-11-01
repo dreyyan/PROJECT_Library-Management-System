@@ -1402,7 +1402,10 @@ public:
             << "   - prints transcript of borrow_history from start to current, formatted along with borrow date\n"
             << "\n"
             << "11. printReturnHistory()\n"
-            << "   - prints transcript of return_history from start to current, formatted along with return date\n";
+            << "   - prints transcript of return_history from start to current, formatted along with return date\n"
+            << ">> /exit\n"
+            << "\n"
+               "   - exits the loop validation\n";
     }
 };
 
@@ -1719,6 +1722,7 @@ public:
             cout << "\n[12] | Table of Contents";
             cout << "\n[13] | Exit";
             cout << "\n---------------------------";
+            cout << "\n['/exit' to Exit Validation]";
             cout << "\n>> ";
             cin >> choice;
             cin.clear();
