@@ -497,8 +497,6 @@ public:
     Book(const string &textDirectory) {
         string bookTitle;
         bool bookAlreadyExists;
-        cout << "\n| -Library-Management-System- |";
-        cout << "\n-_-_-_-_-_-[ADD BOOK]-_-_-_-_-";
 
         // Prompt Book Title as File Name
         do {
@@ -704,6 +702,9 @@ public:
 
     // >> [C]REATE Book [1]
     void createBookFile() {
+        cout << "\n===+==+==+== iSort ==+==+==+===";
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n  -_-_-_-[CREATE BOOK]-_-_-_-";
         Book("txt_files");
     }
 
@@ -716,6 +717,8 @@ public:
         // Book File Variables
         string bookAuthor, bookGenre, bookISBN, bookPublicationDate, bookLanguage, bookContent, bookEdition;
         unsigned int bookPageCount, bookAvailability = true;
+
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n -_-_-[UPDATE BOOK INFO]-_-_-";
 
@@ -760,6 +763,10 @@ public:
         vector<string> currentLines;
         string line;
         int lineNumber;
+
+        cout << "\n===+==+==+== iSort ==+==+==+===";
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-[UPDATE BOOK INFORMATION]-_-";
 
         do { // Error Loop
             // Prompt
@@ -830,8 +837,9 @@ public:
         string bookTitle, line;
         bool fileFound = true;
 
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
-        cout << "\n-_-_-_-_-_-[READ BOOK]-_-_-_-_-";
+        cout << "\n -_-_-_-_-[READ BOOK]-_-_-_-_-";
         // Loop Iteration: Display
         size_t counter = 1;
         for (const auto& book : bookList) {
@@ -878,6 +886,7 @@ public:
     void deleteBook() {
         string bookTitle;
         string filePath = getFilePath(bookTitle);
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-_-[DELETE BOOK]-_-_-_-_-";
 
@@ -919,6 +928,7 @@ public:
 
     // >> Show Booklist [6]
     void showBookList() {
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n -_-_-_-_-[BOOK LIST]-_-_-_-_-";
 
@@ -967,6 +977,7 @@ public:
         bool bookExists, bookAlreadyBorrowed;
         vector<string> currentLines;
 
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-_-[BORROW BOOK]-_-_-_-_-";
 
@@ -1063,6 +1074,7 @@ public:
         bool bookExists, bookAlreadyReturned;
         vector<string> currentLines;
 
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-_-[RETURN BOOK]-_-_-_-_-";
 
@@ -1156,6 +1168,7 @@ public:
     void searchBook() {
         string bookTitle;
         bool bookExists;
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-_-[SEARCH BOOK]-_-_-_-_-";
         // Loop Iteration: Display
@@ -1238,6 +1251,7 @@ public:
 
     // >> Print Borrow History [10]
     void printBorrowHistory() {
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-[BORROW HISTORY]-_-_-_-";
 
@@ -1253,6 +1267,7 @@ public:
 
     // >> Print Return History [11]
     void printReturnHistory() {
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-[RETURN HISTORY]-_-_-_-";
 
@@ -1263,7 +1278,9 @@ public:
         }
     }
 
+    // >> Display Table Of Contents [12]
     void displayTableOfContents() {
+        cout << "\n   ==+==+==+==+==+== iSort ==+==+==+==+==+==";
         cout << "\n   |      -Library-Management-System-      |\n";
         cout << "_-_-_-_-_-_-_-[TABLE OF CONTENTS]-_-_-_-_-_-_-_\n";
         cout << "------------------- CLASSES -------------------\n"
@@ -1327,8 +1344,9 @@ public:
         string username, password;
         bool isRegisteredUsername, isValidUsername, isValidPassword, onRegisterMenu;
         bool hasLetter, hasNumber;
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
-        cout << "\n-_-_-_-_-_-[REGISTER]-_-_-_-_-";
+        cout << "\n -_-_-_-_-[REGISTER]-_-_-_-_-";
         do { // Error Loop
             isRegisteredUsername = false, isValidUsername = true, hasLetter = false, hasNumber = false, onRegisterMenu = true;
             // Prompt
@@ -1477,7 +1495,7 @@ public:
 
         do {
             cout << "\n| -Library-Management-System- |";
-            cout << "\n-_-_-_-_-_-[REGISTER]-_-_-_-_-";
+            cout << "\n -_-_-_-_-[REGISTER]-_-_-_-_-";
             cout << "\n------------------------";
             cout << "\nProceed to Login Page?";
             cout << "\n[1] | Yes";
@@ -1504,8 +1522,9 @@ public:
     void displayLoginMenu() {
         string username, password;
         bool usernameExists, correctPassword;
+        cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
-        cout << "\n-_-_-_-_-_-_-[LOGIN]-_-_-_-_-_-";
+        cout << "\n -_-_-_-_-_-[LOGIN]-_-_-_-_-_-";
         do {
             // Error Loop
             usernameExists = false;
@@ -1552,8 +1571,9 @@ public:
     void displayMenu() {
         int loginMenuChoice;
         do {
+            cout << "\n===+==+==+== iSort ==+==+==+===";
             cout << "\n| -Library-Management-System- |";
-            cout << "\n-_-_-_-_-_-_-[MENU]-_-_-_-_-_-";
+            cout << "\n -_-_-_-_-_-[MENU]-_-_-_-_-_-";
             cout << "\n---------------";
             cout << "\n[1] | Login";
             cout << "\n[2] | Register";
@@ -1588,8 +1608,9 @@ public:
     void displayLibraryMenu() {
         int choice;
         do {
+            cout << "\n===+==+==+== iSort ==+==+==+===";
             cout << "\n| -Library-Management-System- |";
-            cout << "\n-_-_-_-_-_-[LIBRARY]-_-_-_-_-";
+            cout << "\n-_-_-_-_-_-[LIBRARY]-_-_-_-_-_-";
             cout << "\n---------------------------";
             cout << "\n[1] | Create Book File";
             cout << "\n[2] | Input Book Information";
