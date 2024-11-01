@@ -13,6 +13,8 @@
 #include <vector>
 using namespace std;
 
+// NOTE: Add folder as working directory if file functions are not working
+
 /*  ---------------- TABLE OF CONTENTS ----------------
     --------------------- CLASSES ---------------------
     1. Book - Constructor, Getters/Setters, Validators
@@ -633,7 +635,7 @@ public:
 
     //  Getter: File Path
     string getFilePath(const string &bookTitle) const {
-        return "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
+        return "txt_files\\" + bookTitle + ".txt";
     }
 
     /* FILE */
@@ -702,7 +704,7 @@ public:
 
     // >> [C]REATE Book [1]
     void createBookFile() {
-        Book("C:\\CC202_LibraryManagementSystem\\txt_files");
+        Book("txt_files");
     }
 
     // >> Input Book Information [2]
@@ -1017,8 +1019,8 @@ public:
         }
 
         // Directories
-        string currentPath = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
-        string borrowedBookFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\borrowed_books\\" + bookTitle + ".txt";
+        string currentPath = "txt_files\\" + bookTitle + ".txt";
+        string borrowedBookFolder = "txt_files\\borrowed_books\\" + bookTitle + ".txt";
 
         // Error Handling: immovableFile
         if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
@@ -1106,8 +1108,8 @@ public:
         }
 
         // Directories
-        string currentPath = "C:\\CC202_LibraryManagementSystem\\txt_files\\borrowed_books\\" + bookTitle + ".txt";
-        string textFileFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
+        string currentPath = "txt_files\\borrowed_books\\" + bookTitle + ".txt";
+        string textFileFolder = "txt_files\\" + bookTitle + ".txt";
 
         // Error Handling: immovableFile
         if (rename(currentPath.c_str(), textFileFolder.c_str()) != 0) {
