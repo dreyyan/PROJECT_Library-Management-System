@@ -202,6 +202,7 @@ public:
                 }
             }
 
+            // Error Checking: existingISBN
             for (const auto& existingISBN : ISBNList) {
                 if (inputISBN == existingISBN) {
                     isValidISBN = false;
@@ -912,7 +913,7 @@ public:
         } while (bookTitle.empty() || isspace(bookTitle[0]));
 
         string filePath = getFilePath(bookTitle); // Getter
-        ifstream bookFileReader(filePath);
+        ifstream bookFileReader(filePath); // File Reader
 
         // Read File: Accessable File
         if (bookFileReader) {
@@ -989,15 +990,18 @@ public:
         cout << "\n| -Library-Management-System- |";
         cout << "\n -_-_-_-_-[BOOK LIST]-_-_-_-_-";
 
+        // Display If No Book Files in Booklist
         if (bookList.size() == 0) {
             char choice;
             cout << "\nThere are currently no books in the booklist.";
-            do {
+            do { // Error Loop
+                // Prompt
                 cout << "\nWould you like to add one?[y/n]:";
                 cout << "\n>> ";
                 cin >> choice;
                 cin.ignore();
 
+                // Error Handling
                 if (cin.fail()) {
                     cin.clear();
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -1086,6 +1090,7 @@ public:
             }
         }
 
+        // Error Handling: alreadyBorrowed
         if (bookAlreadyBorrowed) {
             cerr << "\nERROR | book_already_borrowed";
             return;
@@ -1121,7 +1126,8 @@ public:
             bookFileWriter.close();
 
             cout << "\nSuccessfully borrowed: " << bookTitle;
-            borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
+            bookList.erase(make_unique<string>(bookTitle)); // Remove Book From Book List
+            borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN); // Add From Borrow History
         }
 
         else {
@@ -1152,6 +1158,7 @@ public:
                 exit(0);
             }
 
+            // Error Handling: isEmpty
             if (bookTitle.empty()) {
                 cerr << "\nERROR | blank_book_title";
             }
@@ -1181,6 +1188,7 @@ public:
             }
         }
 
+        // Error Handling: alreadyReturned
         if (bookAlreadyReturned) {
             cerr << "\nERROR | book_already_returned";
             return;
@@ -1191,7 +1199,7 @@ public:
         string textFileFolder = "txt_files\\" + bookTitle + ".txt";
 
         // Error Handling: immovableFile
-        if (rename(currentPath.c_str(), textFileFolder.c_str()) != 0) {
+        if (rename(currentPath.c_str(), textFileFolder.c_str()) != 0) { // Move File
             cerr << "\nERROR | could_not_move_file";
         }
 
@@ -1204,7 +1212,7 @@ public:
             }
             bookFileReader.close();
 
-            currentLines[lineNumber - 1] = "Availability?: Yes";
+            currentLines[lineNumber - 1] = "Availability?: Yes"; // Change Availability
 
             // Change Content
             ofstream bookFileWriter(textFileFolder);
@@ -1216,9 +1224,11 @@ public:
             bookFileWriter.close();
 
             cout << "\nSuccessfully returned: " << bookTitle;
-            returnHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
+            bookList[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN); // Return Book to Book List
+            returnHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN); // Add to Return History
         }
 
+        // Error Handling: Inaccessible File
         else {
             cerr << "\nERROR | cannot_open_file ";
         }
@@ -1246,7 +1256,7 @@ public:
             counter++;
         }
 
-        do {
+        do { // Error Loop
             bookExists = false;
             // Prompt
             cout << "\nSearch Book | Book Title: ";
@@ -1271,9 +1281,10 @@ public:
 
                 if (bookExists) {
                     int choice;
-                    cout << "\nBook '" << bookTitle << "' found!" << " >> ISBN[" << *book.second << "]";
+                    cout << "\nBook '" << bookTitle << "' found!" << " >> ISBN[" << *book.second << "]"; // Display Book File
 
-                    do {
+                    do { // Error Loop
+                        // Prompt
                         cout << "\nShow Contents?: ";
                         cout << "\n[1] | Yes";
                         cout << "\n[2] | No";
@@ -1291,7 +1302,7 @@ public:
                     if (choice == 1) {
                         string line;
                         string filePath = getFilePath(bookTitle); // Getter
-                        ifstream bookFileReader(filePath); // Create Book File
+                        ifstream bookFileReader(filePath); // File Reader
 
                         // Read File: Accessable File
                         if (bookFileReader) {
@@ -1409,8 +1420,7 @@ public:
     }
 };
 
-class Menu {
-// Menu Class: Recursive
+class Menu { // Menu Class: Recursive
 protected:
     Library &libraryReference;
 public:
@@ -1707,7 +1717,7 @@ public:
             cout << "\n===+==+==+== iSort ==+==+==+===";
             cout << "\n| -Library-Management-System- |";
             cout << "\n-_-_-_-_-_-[LIBRARY]-_-_-_-_-_-";
-            cout << "\n---------------------------";
+            cout << "\n-------------------------------";
             cout << "\n[1] | Create Book File";
             cout << "\n[2] | Input Book Information";
             cout << "\n[3] | Read Book File";
@@ -1722,7 +1732,7 @@ public:
             cout << "\n[12] | Table of Contents";
             cout << "\n[13] | Exit";
             cout << "\n['/exit' to Exit Function Validations ]";
-            cout << "\n---------------------------";
+            cout << "\n-------------------------------";
             cout << "\n>> ";
             cin >> choice;
             cin.clear();
