@@ -13,30 +13,63 @@
 #include <vector>
 using namespace std;
 
+/*  ---------------- TABLE OF CONTENTS ----------------
+    --------------------- CLASSES ---------------------
+    1. Book - Constructor, Getters/Setters, Validators
+        DERIVED:
+            |_ Fiction
+            |_ Non-Fiction
+            |_ E-Book
+            |_ Magazine
+            |_ Comic
+            |_ Textbook
+
+   2. Library - Book Functions
+   3. Menu - Login/Register/Library
+
+    -------------------- FUNCTIONS --------------------
+   1. createBookFile() [C#1]
+   -  creates a book file(.txt) using bookTitle as filename
+
+   2. inputBookInformation() [C#2]
+   -  stores book details/information inside book file using validated information input
+   -  after validation, book is added to book list
+
+   3. readBook() [R]
+   -  reads book file line-by-line
+
+   4. updateBookInformation() [U]
+   -  edits/updates one book detail/information inside book file
+
+   5. deleteBook() [D]
+   -  deletes book file and is removed from the book list
+
+   6. showBookList()
+   -  displays book list /w proper format (book_title[book_ISBN])
+
+   7. borrowBook()
+   -  book is transferred to 'borrowed_books' folder, is transcripted to 'borrow_history', and availability is set to 'No'
+
+   8. returnBook()
+   -  book is transferred back to the 'main' folder, is transcripted to 'return_history', and availability is set back to 'Yes'
+
+   9. searchBook()
+   -  locates book(if exists), displays ISBN, and suggests to show book file content
+
+   10. printBorrowHistory()
+   -  prints transcript of borrow_history from start to current, formatted along with borrow date
+
+   11. printReturnHistory()
+   -  prints transcript of return_history from start to current, formatted along with return date
+ */
+
 // Current Time
 time_t seconds = time(NULL);
 struct tm timeFormat = *localtime(&seconds);
 
-class User { // Base Class [User]
-protected:
-    unique_ptr<string> name, age, contactNumber;
-
-public:
-    User(unique_ptr<string> userName, unique_ptr<string> userAge, unique_ptr<string> userContactNumber)
-        : name(move(userName)), age(move(userAge)), contactNumber(move(userContactNumber)) { /* User Constructor */ }
-};
-
-class Member : public User { // Derived Class [Member << User]
-protected:
-    unique_ptr<string> id;
-
-public:
-    Member(unique_ptr<string> memberName, unique_ptr<string> memberAge, unique_ptr<string> memberContactNumber, unique_ptr<string> memberId)
-        : User(move(name), move(age), move(contactNumber)), id(move(memberId)) { /* Member Constructor */ }
-};
-
 // Standard Template Library[STL] Containers
 map<string, string> loginCredentials;
+vector<string> ISBNList;
 map<unique_ptr<string>, unique_ptr<string>> bookList;
 map<unique_ptr<string>, unique_ptr<string>> borrowHistory;
 map<unique_ptr<string>, unique_ptr<string>> returnHistory;
@@ -54,7 +87,6 @@ protected:
     unsigned int pageCount;
 
     // Library Book Information
-    unsigned int borrowCount = 0;
     bool availability = true;
 
 public:
@@ -119,21 +151,23 @@ public:
 
     string validateBookISBN() {
         string inputISBN;
-        bool ISBNIsDigit;
+        bool isValidISBN;
         do { // Error Loop
-            ISBNIsDigit = true;
+            isValidISBN = true;
             // Prompt
             cout << "\nISBN(10-digits): ";
             getline(cin, inputISBN);
 
             // Error Handling: isEmpty
             if (inputISBN.empty() || isspace(inputISBN[0])) {
+                isValidISBN = false;
                 cerr << "\nERROR | blank_ISBN_input\n";
                 continue;
             }
 
             // Error Handling: validLength
             if (inputISBN.length() != 10) {
+                isValidISBN = false;
                 cerr << "\nERROR | ISBN_must_be_10_digits\n";
                 continue;
             }
@@ -141,17 +175,19 @@ public:
             // Loop Checking: isDigit
             for (char &c : inputISBN) {
                 if (!isdigit(c)) {
-                    ISBNIsDigit = false;
+                    isValidISBN = false;
                     break;
                 }
             }
 
-            // Error Handling: isDigit
-            if (!ISBNIsDigit) {
-                cerr << "\nERROR | non_digit_ISBN_input\n";
+            for (const auto& existingISBN : ISBNList) {
+                if (inputISBN == existingISBN) {
+                    isValidISBN = false;
+                    cerr << "\nERROR | existing_ISBN";
+                    break;
+                }
             }
-
-        } while (inputISBN.empty() || isspace(inputISBN[0]) || inputISBN.length() != 10 || !ISBNIsDigit);
+        } while (!isValidISBN || isspace(inputISBN[0]));
         return inputISBN;
     }
 
@@ -356,7 +392,7 @@ public:
                 continue;
             }
 
-            inputBookContent.pop_back(); // Remove '|' Temporarily
+            inputBookContent.pop_back(); // Remove Sentinel '|' Temporarily
 
             unsigned int wordCount = 0;
             bool isWord = false;
@@ -386,11 +422,6 @@ public:
                     }
                 }
 
-                /*// Word Checking: Last Word
-                if (isWord) {
-                    wordCount++;
-                }*/
-
                 if (wordCount < 10 || wordCount > 301) { // Max Limit: 300 + 1 [Margin of Error]
                     isValidContent = false;
 
@@ -403,6 +434,10 @@ public:
 
         } while (!isValidContent);
         return inputBookContent;
+    }
+
+    bool validateBookAvailability() const {
+        return availability;
     }
 
     // VALIDATOR: Abstraction
@@ -423,9 +458,8 @@ public:
         bookContent = validateBookContent();
     }
 
-    void validateLibraryBookInformation() {
-        // validateBookBorrowCount();
-        // validateBookAvailability();
+    void validateLibraryBookInformation(bool &availability) {
+        availability = validateBookAvailability();
     }
 
     // Error Handling: Book File Already Exists
@@ -441,9 +475,9 @@ public:
     /* CONSTRUCTOR */
     // CONSTRUCTOR: Default
     Book()
-        : title(make_unique<string>("")), author(make_unique<string>("")), genre(make_unique<string>("")), ISBN(make_unique<string>("")), publicationDate(make_unique<string>("")), edition(make_unique<string>("")), language(make_unique<string>("")), description(make_unique<string>("")), pageCount(0), borrowCount(0), availability(true) {}
+        : title(make_unique<string>("")), author(make_unique<string>("")), genre(make_unique<string>("")), ISBN(make_unique<string>("")), publicationDate(make_unique<string>("")), edition(make_unique<string>("")), language(make_unique<string>("")), description(make_unique<string>("")), pageCount(0), availability(true) {}
 
-    // CONSTRUCTOR: Initialization
+    // CONSTRUCTOR: Initialization [Debugging]
     Book(unique_ptr<string> bookTitle,
          unique_ptr<string> bookAuthor,
          unique_ptr<string> bookGenre,
@@ -453,9 +487,9 @@ public:
          unique_ptr<string> bookLanguage,
          unique_ptr<string> bookContent,
          unsigned int bookPageCount,
-         unsigned int bookBorrowCount,
          bool bookAvailability)
-        : title(move(bookTitle)), author(move(bookAuthor)), genre(move(bookGenre)), ISBN(move(bookISBN)), publicationDate(move(bookPublicationDate)), edition(move(bookEdition)), language(move(bookLanguage)), description(move(bookContent)), pageCount(bookPageCount), borrowCount(bookBorrowCount), availability(bookAvailability) {}
+        : title(move(bookTitle)), author(move(bookAuthor)), genre(move(bookGenre)), ISBN(move(bookISBN)), publicationDate(move(bookPublicationDate)), edition(move(bookEdition)), language(move(bookLanguage)), description(move(bookContent)), pageCount(bookPageCount), availability(bookAvailability) {
+    }
 
     // CONSTRUCTOR: Book File <- addBook();
     Book(const string &textDirectory) {
@@ -494,6 +528,102 @@ public:
     }
 };
 
+// CONSTRUCTOR: Initialization [Debugging]
+class Fiction : public Book {
+public:
+    Fiction(unique_ptr<string> fictionBookTitle,
+     unique_ptr<string> fictionBookAuthor,
+     unique_ptr<string> fictionBookGenre,
+     unique_ptr<string> fictionBookISBN,
+     unique_ptr<string> fictionBookPublicationDate,
+     unique_ptr<string> fictionBookEdition,
+     unique_ptr<string> fictionBookLanguage,
+     unique_ptr<string> fictionBookContent,
+     unsigned int fictionBookPageCount,
+     bool fictionBookAvailability)
+    : Book(move(fictionBookTitle), move(fictionBookAuthor), move(fictionBookGenre), move(fictionBookISBN), move(fictionBookPublicationDate), move(fictionBookEdition), move(fictionBookLanguage), move(fictionBookContent), fictionBookPageCount, fictionBookAvailability) {}
+};
+
+// CONSTRUCTOR: Initialization [Debugging]
+class NonFiction : public Book {
+public:
+    NonFiction(unique_ptr<string> nonFictionBookTitle,
+     unique_ptr<string> nonFictionBookAuthor,
+     unique_ptr<string> nonFictionBookGenre,
+     unique_ptr<string> nonFictionBookISBN,
+     unique_ptr<string> nonFictionBookPublicationDate,
+     unique_ptr<string> nonFictionBookEdition,
+     unique_ptr<string> nonFictionBookLanguage,
+     unique_ptr<string> nonFictionBookContent,
+     unsigned int nonFictionBookPageCount,
+     bool nonFictionBookAvailability)
+    : Book(move(nonFictionBookTitle), move(nonFictionBookAuthor), move(nonFictionBookGenre), move(nonFictionBookISBN), move(nonFictionBookPublicationDate), move(nonFictionBookEdition), move(nonFictionBookLanguage), move(nonFictionBookContent), nonFictionBookPageCount, nonFictionBookAvailability) {}
+};
+
+// CONSTRUCTOR: Initialization [Debugging]
+class EBook : public Book {
+public:
+    EBook(unique_ptr<string> ebookBookTitle,
+     unique_ptr<string> ebookBookAuthor,
+     unique_ptr<string> ebookBookGenre,
+     unique_ptr<string> ebookBookISBN,
+     unique_ptr<string> ebookBookPublicationDate,
+     unique_ptr<string> ebookBookEdition,
+     unique_ptr<string> ebookBookLanguage,
+     unique_ptr<string> ebookBookContent,
+     unsigned int ebookBookPageCount,
+     bool ebookBookAvailability)
+    : Book(move(ebookBookTitle), move(ebookBookAuthor), move(ebookBookGenre), move(ebookBookISBN), move(ebookBookPublicationDate), move(ebookBookEdition), move(ebookBookLanguage), move(ebookBookContent), ebookBookPageCount, ebookBookAvailability) {}
+};
+
+// CONSTRUCTOR: Initialization [Debugging]
+class Magazine : public Book {
+public:
+    Magazine(unique_ptr<string> magazineBookTitle,
+     unique_ptr<string> magazineBookAuthor,
+     unique_ptr<string> magazineBookGenre,
+     unique_ptr<string> magazineBookISBN,
+     unique_ptr<string> magazineBookPublicationDate,
+     unique_ptr<string> magazineBookEdition,
+     unique_ptr<string> magazineBookLanguage,
+     unique_ptr<string> magazineBookContent,
+     unsigned int magazineBookPageCount,
+     bool magazineBookAvailability)
+    : Book(move(magazineBookTitle), move(magazineBookAuthor), move(magazineBookGenre), move(magazineBookISBN), move(magazineBookPublicationDate), move(magazineBookEdition), move(magazineBookLanguage), move(magazineBookContent), magazineBookPageCount, magazineBookAvailability) {}
+};
+
+// CONSTRUCTOR: Initialization [Debugging]
+class Comic : public Book {
+public:
+    Comic(unique_ptr<string> comicBookTitle,
+     unique_ptr<string> comicBookAuthor,
+     unique_ptr<string> comicBookGenre,
+     unique_ptr<string> comicBookISBN,
+     unique_ptr<string> comicBookPublicationDate,
+     unique_ptr<string> comicBookEdition,
+     unique_ptr<string> comicBookLanguage,
+     unique_ptr<string> comicBookContent,
+     unsigned int comicBookPageCount,
+     bool comicBookAvailability)
+    : Book(move(comicBookTitle), move(comicBookAuthor), move(comicBookGenre), move(comicBookISBN), move(comicBookPublicationDate), move(comicBookEdition), move(comicBookLanguage), move(comicBookContent), comicBookPageCount, comicBookAvailability) {}
+};
+
+// CONSTRUCTOR: Initialization [Debugging]
+class Textbook : public Book {
+public:
+    Textbook(unique_ptr<string> textbookBookTitle,
+     unique_ptr<string> textbookBookAuthor,
+     unique_ptr<string> textbookBookGenre,
+     unique_ptr<string> textbookBookISBN,
+     unique_ptr<string> textbookBookPublicationDate,
+     unique_ptr<string> textbookBookEdition,
+     unique_ptr<string> textbookBookLanguage,
+     unique_ptr<string> textbookBookContent,
+     unsigned int textbookBookPageCount,
+     bool textbookBookAvailability)
+    : Book(move(textbookBookTitle), move(textbookBookAuthor), move(textbookBookGenre), move(textbookBookISBN), move(textbookBookPublicationDate), move(textbookBookEdition), move(textbookBookLanguage), move(textbookBookContent), textbookBookPageCount, textbookBookAvailability) {}
+};
+
 class Library { // Library Class
 protected:
     Book &bookReference; // Reference to Book
@@ -525,7 +655,7 @@ public:
     }
 
     // FILE: Input
-    void inputValidatedInformation(const string &filePath, const string &bookTitle, const string &bookAuthor, const string &bookGenre, const string &bookISBN, const string &bookPublicationDate, const string &bookEdition, const string &bookLanguage, const string &bookContent, const unsigned int &bookPageCount) {
+    void inputValidatedInformation(const string &filePath, const string &bookTitle, const string &bookAuthor, const string &bookGenre, const string &bookISBN, const string &bookPublicationDate, const string &bookEdition, const string &bookLanguage, const string &bookContent, const unsigned int &bookPageCount, const bool &availability) {
         cout << "\n>> updating basic information in book file...";
         // Open File
         ofstream enterText(filePath);
@@ -542,6 +672,8 @@ public:
             enterText << "\nPHYSICAL INFORMATION |\n";
             enterText << "Language: " << bookLanguage << "\n";
             enterText << "# of Pages: " << bookPageCount << "\n";
+            enterText << "\nLIBRARY INFORMATION |\n";
+            enterText << "Available?: " << (availability? "Yes" : "No") << "\n";
             enterText << "\nContent:\n" << bookContent << "\n";
         }
     }
@@ -569,7 +701,7 @@ public:
     }
 
     // >> [C]REATE Book [1]
-    void createBook() {
+    void createBookFile() {
         Book("C:\\CC202_LibraryManagementSystem\\txt_files");
     }
 
@@ -581,7 +713,7 @@ public:
 
         // Book File Variables
         string bookAuthor, bookGenre, bookISBN, bookPublicationDate, bookLanguage, bookContent, bookEdition;
-        unsigned int bookPageCount, bookBorrowCount = 0, bookAvailability = true;
+        unsigned int bookPageCount, bookAvailability = true;
         cout << "\n| -Library-Management-System- |";
         cout << "\n -_-_-[UPDATE BOOK INFO]-_-_-";
 
@@ -607,7 +739,7 @@ public:
                 cout << "\nPHYSICAL INFORMATION |";
                 bookReference.validatePhysicalDetails(bookLanguage, bookPageCount, bookContent);
                 // Input Validated Information to Book File
-                inputValidatedInformation(filePath, bookTitle, bookAuthor, bookGenre, bookISBN, bookPublicationDate, bookEdition, bookLanguage, bookContent, bookPageCount);
+                inputValidatedInformation(filePath, bookTitle, bookAuthor, bookGenre, bookISBN, bookPublicationDate, bookEdition, bookLanguage, bookContent, bookPageCount, bookAvailability);
                 readBookFile(bookTitle);
                 bookList[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
             }
@@ -629,7 +761,7 @@ public:
 
         do { // Error Loop
             // Prompt
-            cout << "\nBook Title: ";
+            cout << "\nSearch Book | Title: ";
             getline(cin, bookTitle);
 
             // Error Handling: isEmpty
@@ -788,6 +920,36 @@ public:
         cout << "\n| -Library-Management-System- |";
         cout << "\n -_-_-_-_-[BOOK LIST]-_-_-_-_-";
 
+        if (bookList.size() == 0) {
+            char choice;
+            cout << "\nThere are currently no books in the booklist.";
+            do {
+                cout << "\nWould you like to add one?[y/n]:";
+                cout << "\n>> ";
+                cin >> choice;
+                cin.ignore();
+
+                if (cin.fail()) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cerr << "\nERROR | invalid_input";
+                }
+
+                if (choice == 'y' || choice == 'Y') {
+                    createBookFile();
+                }
+
+                else if (choice == 'n' || choice == 'N') {
+                    return;
+                }
+
+                else {
+                    cout << "\nInvalid Input.\n";
+                }
+
+            } while (cin.fail());
+        }
+
         // Loop Iteration: Display
         size_t counter = 1;
         for (const auto& book : bookList) {
@@ -798,11 +960,14 @@ public:
 
     // >> Borrow Book [7]
     void borrowBook() {
-        string bookTitle, bookISBN;
-        bool bookExists = false, bookAlreadyBorrowed = false;
+        string bookTitle, bookISBN, line;
+        int lineNumber = 17;
+        bool bookExists, bookAlreadyBorrowed;
+        vector<string> currentLines;
 
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-_-[BORROW BOOK]-_-_-_-_-";
+
         // Loop Iteration: Display
         size_t counter = 1;
         for (const auto& book : bookList) {
@@ -811,6 +976,8 @@ public:
         }
 
         do { // Error Loop
+            bookExists = false;
+            bookAlreadyBorrowed = false;
             // Prompt
             cout << "\nBook Title: ";
             getline(cin, bookTitle);
@@ -824,12 +991,13 @@ public:
         // Loop Handling: bookExists
         for (const auto& book : bookList) {
             if (*book.first == bookTitle) {
-                bookISBN = *book.second;
                 bookExists = true;
+                bookISBN = *book.second;
                 break;
             }
         }
 
+        // Error Handling: bookDoesNotExist
         if (!bookExists) {
             cerr << "\nERROR | book_does_not_exist";
             return;
@@ -852,21 +1020,46 @@ public:
         string currentPath = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
         string borrowedBookFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\borrowed_books\\" + bookTitle + ".txt";
 
-            // Error Handling: immovableFile
+        // Error Handling: immovableFile
         if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
             cerr << "\nERROR | could_not_move_file";
         }
 
-        else {
+        ifstream bookFileReader(borrowedBookFolder); // File Reader
+
+        // Display Current Content
+        if (bookFileReader) {
+            while (getline(bookFileReader, line)) {
+                currentLines.push_back(line); // Store Content
+            }
+            bookFileReader.close();
+
+            currentLines[lineNumber - 1] = "Availability?: No";
+
+            // Change Content
+            ofstream bookFileWriter(borrowedBookFolder);
+            for (const auto& modifiedLine : currentLines) {
+                bookFileWriter << modifiedLine << "\n";
+            }
+
+            // Close Book
+            bookFileWriter.close();
+
             cout << "\nSuccessfully borrowed: " << bookTitle;
             borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
+        }
+
+        else {
+            cerr << "\nERROR | cannot_open_file ";
         }
     }
 
     // >> Return Book [8]
     void returnBook() {
-        string bookTitle, bookISBN;
+        string bookTitle, bookISBN, line;
+        int lineNumber = 17;
         bool bookExists, bookAlreadyReturned;
+        vector<string> currentLines;
 
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-_-[RETURN BOOK]-_-_-_-_-";
@@ -914,16 +1107,39 @@ public:
 
         // Directories
         string currentPath = "C:\\CC202_LibraryManagementSystem\\txt_files\\borrowed_books\\" + bookTitle + ".txt";
-        string borrowedBookFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
+        string textFileFolder = "C:\\CC202_LibraryManagementSystem\\txt_files\\" + bookTitle + ".txt";
 
         // Error Handling: immovableFile
-        if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
+        if (rename(currentPath.c_str(), textFileFolder.c_str()) != 0) {
             cerr << "\nERROR | could_not_move_file";
         }
 
-        else {
+        ifstream bookFileReader(textFileFolder); // File Reader
+
+        // Display Current Content
+        if (bookFileReader) {
+            while (getline(bookFileReader, line)) {
+                currentLines.push_back(line); // Store Content
+            }
+            bookFileReader.close();
+
+            currentLines[lineNumber - 1] = "Availability?: Yes";
+
+            // Change Content
+            ofstream bookFileWriter(textFileFolder);
+            for (const auto& modifiedLine : currentLines) {
+                bookFileWriter << modifiedLine << "\n";
+            }
+
+            // Close Book
+            bookFileWriter.close();
+
             cout << "\nSuccessfully returned: " << bookTitle;
             returnHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
+        }
+
+        else {
+            cerr << "\nERROR | cannot_open_file ";
         }
 
         // Loop Iteration: Display
@@ -1026,7 +1242,7 @@ public:
         // Loop Handling: Print Borrow History
         for (const auto& bHistory : borrowHistory) {
             cout << "\n* " << *bHistory.first << "[" << *bHistory.second << "] borrowed | "
-            << timeFormat.tm_mon + 1 << "/" << timeFormat.tm_mday << "/" << timeFormat.tm_year + 1900;
+            << timeFormat.tm_mon + 1 << " / " << timeFormat.tm_mday << " / " << timeFormat.tm_year + 1900;
         }
     }
 
@@ -1041,8 +1257,60 @@ public:
         // Loop Handling: Print Return History
         for (const auto& rHistory : returnHistory) {
             cout << "\n* " << *rHistory.first << "[" << *rHistory.second << "] returned | "
-            << timeFormat.tm_mon + 1 << "/" << timeFormat.tm_mday << "/" << timeFormat.tm_year + 1900;
+            << timeFormat.tm_mon + 1 << " / " << timeFormat.tm_mday << " / " << timeFormat.tm_year + 1900;
         }
+    }
+
+    void displayTableOfContents() {
+        cout << "\n   |      -Library-Management-System-      |\n";
+        cout << "_-_-_-_-_-_-_-[TABLE OF CONTENTS]-_-_-_-_-_-_-_\n";
+        cout << "------------------- CLASSES -------------------\n"
+            << "1. Book - Constructor, Getters/Setters, Validators\n"
+            << "   DERIVED:\n"
+            << "       |_ Fiction\n"
+            << "       |_ Non-Fiction\n"
+            << "       |_ E-Book\n"
+            << "       |_ Magazine\n"
+            << "       |_ Comic\n"
+            << "       |_ Textbook\n"
+            << "\n"
+            << "2. Library - Book Functions\n"
+            << "3. Menu - Login/Register/Library\n"
+            << "\n"
+            << "-------------------- FUNCTIONS --------------------\n"
+            << "1. createBookFile() [C#1]\n"
+            << "   - creates a book file(.txt) using bookTitle as filename\n"
+            << "\n"
+            << "2. inputBookInformation() [C#2]\n"
+            << "   - stores book details/information inside book file using validated information input\n"
+            << "   - after validation, book is added to book list\n"
+            << "\n"
+            << "3. readBook() [R]\n"
+            << "   - reads book file line-by-line\n"
+            << "\n"
+            << "4. updateBookInformation() [U]\n"
+            << "   - edits/updates one book detail/information inside book file\n"
+            << "\n"
+            << "5. deleteBook() [D]\n"
+            << "   - deletes book file and is removed from the book list\n"
+            << "\n"
+            << "6. showBookList()\n"
+            << "   - displays book list /w proper format (book_title[book_ISBN])\n"
+            << "\n"
+            << "7. borrowBook()\n"
+            << "   - book is transferred to 'borrowed_books' folder, is transcripted to 'borrow_history', and availability is set to 'No'\n"
+            << "\n"
+            << "8. returnBook()\n"
+            << "   - book is transferred back to the 'main' folder, is transcripted to 'return_history', and availability is set back to 'Yes'\n"
+            << "\n"
+            << "9. searchBook()\n"
+            << "   - locates book(if exists), displays ISBN, and suggests to show book file content\n"
+            << "\n"
+            << "10. printBorrowHistory()\n"
+            << "   - prints transcript of borrow_history from start to current, formatted along with borrow date\n"
+            << "\n"
+            << "11. printReturnHistory()\n"
+            << "   - prints transcript of return_history from start to current, formatted along with return date\n";
     }
 };
 
@@ -1126,6 +1394,7 @@ public:
             for (const auto& existingUsername : loginCredentials) {
                 if (existingUsername.first == username) {
                     isRegisteredUsername = true;
+                    isValidUsername = false;
                     cerr << "\nERROR | username_already_registered";
                     break;
                 }
@@ -1320,10 +1589,10 @@ public:
             cout << "\n| -Library-Management-System- |";
             cout << "\n-_-_-_-_-_-[LIBRARY]-_-_-_-_-";
             cout << "\n---------------------------";
-            cout << "\n[1] | Create Book";
+            cout << "\n[1] | Create Book File";
             cout << "\n[2] | Input Book Information";
-            cout << "\n[3] | Update Information";
-            cout << "\n[4] | Read Book";
+            cout << "\n[3] | Read Book";
+            cout << "\n[4] | Update Information";
             cout << "\n[5] | Delete Book";
             cout << "\n[6] | Show Booklist";
             cout << "\n[7] | Borrow Book";
@@ -1331,7 +1600,8 @@ public:
             cout << "\n[9] | Search Book";
             cout << "\n[10] | Borrow History";
             cout << "\n[11] | Return History";
-            cout << "\n[12] | Exit";
+            cout << "\n[12] | Table of Contents";
+            cout << "\n[13] | Exit";
             cout << "\n---------------------------";
             cout << "\n>> ";
             cin >> choice;
@@ -1340,16 +1610,16 @@ public:
 
             switch (choice) {
             case 1:
-                libraryReference.createBook();
+                libraryReference.createBookFile();
                 break;
             case 2:
                 libraryReference.inputBookInformation();
                 break;
             case 3:
-                libraryReference.updateBookInformation();
+                libraryReference.readBook();
                 break;
             case 4:
-                libraryReference.readBook();
+                libraryReference.updateBookInformation();
                 break;
             case 5:
                 libraryReference.deleteBook();
@@ -1373,6 +1643,9 @@ public:
                 libraryReference.printReturnHistory();
                 break;
             case 12:
+                libraryReference.displayTableOfContents();
+                break;
+            case 13:
                 displayMenu();
                 break;
             default:
@@ -1408,7 +1681,7 @@ int main() {
     Book book; // Default Book Constructor for Library
     Library library(book); // Library Constructor for Menu
     unique_ptr<Menu> startProgram = make_unique<Menu>(library); // Function Wrapper: Smart Pointer -> Function
-    /*startProgram->displayMenu(); // Start Prgoram*/
-    startProgram->displayLibraryMenu();
+    startProgram->displayMenu(); // [PROGRAM]
+    // startProgram->displayLibraryMenu(); // [DEBUGGING]
     return 0;
 }
