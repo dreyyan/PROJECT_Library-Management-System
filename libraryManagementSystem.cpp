@@ -1711,7 +1711,7 @@ public:
             cout << "\n[1] | Create Book File";
             cout << "\n[2] | Input Book Information";
             cout << "\n[3] | Read Book File";
-            cout << "\n[4] | Update Information";
+            cout << "\n[4] | Update Book Information";
             cout << "\n[5] | Delete Book File";
             cout << "\n[6] | Show Booklist";
             cout << "\n[7] | Borrow Book";
