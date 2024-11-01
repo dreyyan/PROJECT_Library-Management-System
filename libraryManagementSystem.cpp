@@ -30,7 +30,7 @@ using namespace std;
    3. Menu - Login/Register/Library
 
     -------------------- FUNCTIONS --------------------
-   1. createBookFile() [C#1]
+   1. createBookfile() [C#1]
    -  creates a book file(.txt) using bookTitle as filename
 
    2. inputBookInformation() [C#2]
@@ -43,10 +43,10 @@ using namespace std;
    4. updateBookInformation() [U]
    -  edits/updates one book detail/information inside book file
 
-   5. deleteBook() [D]
+   5. deleteBookfile() [D]
    -  deletes book file and is removed from the book list
 
-   6. showBookList()
+   6. showBooklist()
    -  displays book list /w proper format (book_title[book_ISBN])
 
    7. borrowBook()
@@ -111,6 +111,11 @@ public:
             cout << "\nBook Title: ";
             getline(cin, fileName);
 
+            // Input Handling: Exit Loop
+            if (fileName == "/exit") {
+                exit(0);
+            }
+
             // Error Handling: isEmpty
             if (fileName.empty() || isspace(fileName[0])) {
                 cerr << "\nERROR | blank_title_input\n";
@@ -125,6 +130,11 @@ public:
             // Prompt
             cout << "\nAuthor: ";
             getline(cin, inputAuthor);
+
+            // Input Handling: Exit Loop
+            if (inputAuthor == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (inputAuthor.empty() || isspace(inputAuthor[0])) {
@@ -141,6 +151,11 @@ public:
             // Prompt
             cout << "\nGenre: ";
             getline(cin, inputGenre);
+
+            // Input Handling: Exit Loop
+            if (inputGenre == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (inputGenre.empty() || isspace(inputGenre[0])) {
@@ -159,6 +174,11 @@ public:
             // Prompt
             cout << "\nISBN(10-digits): ";
             getline(cin, inputISBN);
+
+            // Input Handling: Exit Loop
+            if (inputISBN == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (inputISBN.empty() || isspace(inputISBN[0])) {
@@ -208,6 +228,11 @@ public:
             cout << "\nPublication Date(MM/DD/YYYY): ";
             getline(cin, inputPublicationDate);
 
+            // Input Handling: Exit Loop
+            if (inputPublicationDate == "/exit") {
+                exit(0);
+            }
+
             // Error Handling: isEmpty
             if (inputPublicationDate.empty() || isspace(inputPublicationDate[0])) {
                 isValidPublicationDate = false;
@@ -253,6 +278,11 @@ public:
             // Prompt
             cout << "\nEdition(blank if not applicable): ";
             getline(cin, inputBookEdition);
+
+            // Input Handling: Exit Loop
+            if (inputBookEdition == "/exit") {
+                exit(0);
+            }
 
             // Input Handling: isEmpty
             if (inputBookEdition.empty() || isspace(inputBookEdition[0])) {
@@ -379,6 +409,11 @@ public:
             cout << "\nContent:\n";
 
             getline(cin, inputBookContent); // Input Content
+
+            // Input Handling: Exit Loop
+            if (inputBookContent == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (inputBookContent.empty() || isspace(inputBookContent[0])) {
@@ -727,6 +762,12 @@ public:
             cout << "\nSearch Book | Title: ";
             getline(cin, bookTitle);
 
+            // Input Handling: Exit Loop
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
+
+            // Error Handling: isEmpty
             if (bookTitle.empty() || isspace(bookTitle[0])) {
                 cerr << "\nERROR | blank_book_title\n";
                 continue;
@@ -772,6 +813,11 @@ public:
             // Prompt
             cout << "\nSearch Book | Title: ";
             getline(cin, bookTitle);
+
+            // Input Handling: Exit Loop
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (bookTitle.empty() || isspace(bookTitle[0])) {
@@ -840,6 +886,7 @@ public:
         cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n -_-_-_-_-[READ BOOK]-_-_-_-_-";
+
         // Loop Iteration: Display
         size_t counter = 1;
         for (const auto& book : bookList) {
@@ -851,6 +898,11 @@ public:
             // Prompt
             cout << "\nBook Title: ";
             getline(cin, bookTitle);
+
+            // Input Handling: Exit Loop
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (bookTitle.empty() || isspace(bookTitle[0])) {
@@ -901,6 +953,11 @@ public:
             // Prompt
             cout << "\nBook Title: ";
             getline(cin, bookTitle);
+
+            // Input Handling: Exit Loop
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (bookTitle.empty() || isspace(bookTitle[0])) {
@@ -995,6 +1052,11 @@ public:
             cout << "\nBook Title: ";
             getline(cin, bookTitle);
 
+            // Input Handling: Exit Loop
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
+
             if (bookTitle.empty()) {
                 cerr << "\nERROR | blank_book_title";
             }
@@ -1085,6 +1147,11 @@ public:
             cout << "\nBook Title: ";
             getline(cin, bookTitle);
 
+            // Input Handling: Exit Loop
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
+
             if (bookTitle.empty()) {
                 cerr << "\nERROR | blank_book_title";
             }
@@ -1171,6 +1238,7 @@ public:
         cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n-_-_-_-_-[SEARCH BOOK]-_-_-_-_-";
+
         // Loop Iteration: Display
         size_t counter = 1;
         for (const auto& book : bookList) {
@@ -1183,6 +1251,11 @@ public:
             // Prompt
             cout << "\nSearch Book | Book Title: ";
             getline(cin, bookTitle);
+
+            // Input Handling: Exit Loop
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (bookTitle.empty() || bookTitle[0] == ' ') {
@@ -1297,23 +1370,23 @@ public:
             << "3. Menu - Login/Register/Library\n"
             << "\n"
             << "-------------------- FUNCTIONS --------------------\n"
-            << "1. createBookFile() [C#1]\n"
+            << "1. createBookfile() [C#1]\n"
             << "   - creates a book file(.txt) using bookTitle as filename\n"
             << "\n"
             << "2. inputBookInformation() [C#2]\n"
             << "   - stores book details/information inside book file using validated information input\n"
             << "   - after validation, book is added to book list\n"
             << "\n"
-            << "3. readBook() [R]\n"
+            << "3. readBookfile() [R]\n"
             << "   - reads book file line-by-line\n"
             << "\n"
             << "4. updateBookInformation() [U]\n"
             << "   - edits/updates one book detail/information inside book file\n"
             << "\n"
-            << "5. deleteBook() [D]\n"
+            << "5. deleteBookfile() [D]\n"
             << "   - deletes book file and is removed from the book list\n"
             << "\n"
-            << "6. showBookList()\n"
+            << "6. showBooklist()\n"
             << "   - displays book list /w proper format (book_title[book_ISBN])\n"
             << "\n"
             << "7. borrowBook()\n"
@@ -1353,6 +1426,11 @@ public:
             cout << "\n[ Character Length: min. 5 / max. 15 | a-z, 1-3 | No Spaces ]";
             cout << "\nUsername: ";
             getline(cin, username);
+
+            // Input Handling: Exit Loop
+            if (username == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (username.empty() || username[0] == ' ') {
@@ -1428,6 +1506,11 @@ public:
             cout << "\n[ Character Length: min. 5 / max. 15 | a-z, 1-3 | No Spaces ]";
             cout << "\nPassword: ";
             getline(cin, password);
+
+            // Input Handling: Exit Loop
+            if (password == "/exit") {
+                exit(0);
+            }
 
             // Error Handling: isEmpty
             if (password.empty() || password[0] == ' ') {
@@ -1532,6 +1615,11 @@ public:
             cout << "\nUsername: ";
             getline(cin, username);
 
+            // Input Handling: Exit Loop
+            if (username == "/exit") {
+                exit(0);
+            }
+
             // Input Handling: usernameExists
             for (const auto& existingUsername : loginCredentials) {
                 if (existingUsername.first == username) {
@@ -1552,6 +1640,11 @@ public:
             // Prompt
             cout << "\nPassword: ";
             getline(cin, password);
+
+            // Input Handling: Exit Loop
+            if (password == "/exit") {
+                exit(0);
+            }
 
             // Input Handling: correctPassword
             if (loginCredentials[username] == password) {
