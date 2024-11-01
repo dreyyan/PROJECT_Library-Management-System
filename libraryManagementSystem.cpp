@@ -679,7 +679,7 @@ public:
     }
 
     // FILE: Read
-    void readBookFile(const string &bookTitle) {
+    void readBookfile(const string &bookTitle) {
         cout << "\n>> reading book file...";
         string line, filePath = getFilePath(bookTitle); // Getter
         ifstream bookFileReader(filePath); // File Reader
@@ -701,7 +701,7 @@ public:
     }
 
     // >> [C]REATE Book [1]
-    void createBookFile() {
+    void createBookfile() {
         cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n  -_-_-_-[CREATE BOOK]-_-_-_-";
@@ -745,7 +745,7 @@ public:
                 bookReference.validatePhysicalDetails(bookLanguage, bookPageCount, bookContent);
                 // Input Validated Information to Book File
                 inputValidatedInformation(filePath, bookTitle, bookAuthor, bookGenre, bookISBN, bookPublicationDate, bookEdition, bookLanguage, bookContent, bookPageCount, bookAvailability);
-                readBookFile(bookTitle);
+                readBookfile(bookTitle);
                 bookList[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
             }
 
@@ -833,7 +833,7 @@ public:
     }
 
     // >> [R]EAD Book [4]
-    void readBook() {
+    void readBookfile() {
         string bookTitle, line;
         bool fileFound = true;
 
@@ -883,7 +883,7 @@ public:
     }
 
     // >> [D]ELETE Book [5]
-    void deleteBook() {
+    void deleteBookfile() {
         string bookTitle;
         string filePath = getFilePath(bookTitle);
         cout << "\n===+==+==+== iSort ==+==+==+===";
@@ -927,7 +927,7 @@ public:
     }
 
     // >> Show Booklist [6]
-    void showBookList() {
+    void showBooklist() {
         cout << "\n===+==+==+== iSort ==+==+==+===";
         cout << "\n| -Library-Management-System- |";
         cout << "\n -_-_-_-_-[BOOK LIST]-_-_-_-_-";
@@ -948,7 +948,7 @@ public:
                 }
 
                 if (choice == 'y' || choice == 'Y') {
-                    createBookFile();
+                    createBookfile();
                 }
 
                 else if (choice == 'n' || choice == 'N') {
@@ -1614,9 +1614,9 @@ public:
             cout << "\n---------------------------";
             cout << "\n[1] | Create Book File";
             cout << "\n[2] | Input Book Information";
-            cout << "\n[3] | Read Book";
+            cout << "\n[3] | Read Book File";
             cout << "\n[4] | Update Information";
-            cout << "\n[5] | Delete Book";
+            cout << "\n[5] | Delete Book File";
             cout << "\n[6] | Show Booklist";
             cout << "\n[7] | Borrow Book";
             cout << "\n[8] | Return Book";
@@ -1633,22 +1633,22 @@ public:
 
             switch (choice) {
             case 1:
-                libraryReference.createBookFile();
+                libraryReference.createBookfile();
                 break;
             case 2:
                 libraryReference.inputBookInformation();
                 break;
             case 3:
-                libraryReference.readBook();
+                libraryReference.readBookfile();
                 break;
             case 4:
                 libraryReference.updateBookInformation();
                 break;
             case 5:
-                libraryReference.deleteBook();
+                libraryReference.deleteBookfile();
                 break;
             case 6:
-                libraryReference.showBookList();
+                libraryReference.showBooklist();
                 break;
             case 7:
                 libraryReference.borrowBook();
