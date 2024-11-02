@@ -1881,7 +1881,7 @@ int main() {
     Book book; // Default Book Constructor for Library
     Library library(book); // Library Constructor for Menu
     unique_ptr<Menu> startProgram = make_unique<Menu>(library); // Function Wrapper: Smart Pointer -> Function
-    //startProgram->displayMenu(); // [PROGRAM]
-    startProgram->displayLibraryMenu(); // [DEBUGGING]
+    startProgram->displayMenu(); // [PROGRAM]
+    //startProgram->displayLibraryMenu(); // [DEBUGGING]
     return 0;
 }
