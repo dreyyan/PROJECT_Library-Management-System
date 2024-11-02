@@ -256,27 +256,44 @@ public:
             }
 
             else {
-                // Loop Checking: isValidDate
-                for (size_t i = 0; i < inputPublicationDate.length(); i++) {
-                    if (i == 2 || i == 5) {
-                        // Error Handling: Date Separators(/)
-                        if (inputPublicationDate[i] != '/') {
+                // Erorr Handling: Date Separators
+                if (inputPublicationDate[2] != '/' || inputPublicationDate[5] != '/') {
+                    isValidPublicationDate = false;
+                    cerr << "\nERROR | invalid_date_separators";
+                }
+
+                // Error Handling: Validity & Format
+                else {
+                    for (size_t i = 0; i < inputPublicationDate.length(); i++) {
+                        if (i == 2 || i == 5) {
+                            continue;
+                        }
+
+                        // Error Handling: Non-Digit
+                        if (!isdigit(inputPublicationDate[i])) {
                             isValidPublicationDate = false;
-                            cerr << "\nERROR | invalid_date_separators";
+                            cerr << "\nERROR | non_digit_publication_date_input\n";
                             break;
                         }
                     }
 
-                    // Error Handling: isDigit
-                    else if (!isdigit(inputPublicationDate[i])) {
+                    // Error Handling: Invalid Month
+                    int month = (inputPublicationDate[0] - '0') * 10 + (inputPublicationDate[1] - '0');
+                    if (month < 1 || month > 12) {
                         isValidPublicationDate = false;
-                        cerr << "\nERROR | non_digit_publication_date_input\n";
-                        break;
+                        cerr << "\nERROR | invalid_month\n";
+                    }
+
+                    // Error Handling: Invalid Day
+                    int day = (inputPublicationDate[3] - '0') * 10 + (inputPublicationDate[4] - '0');
+                    if (day < 1 || day > 31) { // Simplistic day check
+                        isValidPublicationDate = false;
+                        cerr << "\nERROR | invalid_day\n";
                     }
                 }
             }
 
-        } while (inputPublicationDate.empty() || isspace(inputPublicationDate[0]) || !isValidPublicationDate);
+        } while (!isValidPublicationDate);
 
         return inputPublicationDate;
     }
@@ -1065,177 +1082,16 @@ public:
         }
     }
 
-// >> Borrow Book [7]
-void borrowBook() {
-    string bookTitle, bookISBN, line;
-    int lineNumber = 16;
-    bool bookExists = false, invalidBorrow = false;
-    vector<string> currentLines;
+    // >> Borrow Book [7]
+    void borrowBook() {
+        string bookTitle, bookISBN, line;
+        int lineNumber = 16;
+        bool bookExists = false, invalidBorrow = false;
+        vector<string> currentLines;
 
-    cout << "\n===+==+==+== iSort ==+==+==+===";
-    cout << "\n| -Library-Management-System- |";
-    cout << "\n-_-_-_-_-[BORROW BOOK]-_-_-_-_-";
-
-    // Display available books
-    size_t counter = 1;
-    for (const auto& book : bookList) {
-        cout << "\n" << counter << ". " << book.first << " [" << *book.second << "]";
-        counter++;
-    }
-
-    do { // Error Handling
-        cout << "\nBook Title: ";
-        getline(cin, bookTitle);
-
-        // Input Handling: Exit Code
-        if (bookTitle == "/exit") {
-            exit(0);
-        }
-
-        // Error Handling: isEmpty
-        if (bookTitle.empty()) {
-            cerr << "\nERROR | blank_book_title";
-        }
-
-    } while (bookTitle.empty());
-
-    // Check if the book exists
-    for (const auto& book : bookList) {
-        if (book.first == bookTitle) {
-            bookExists = true;
-            bookISBN = *book.second;
-            break;
-        }
-    }
-
-    // Error Handling: Book Non-Existing
-    if (!bookExists) {
-        cerr << "\nERROR | book_does_not_exist";
-        return;
-    }
-
-    // Directories
-    string currentPath = "txt_files\\" + bookTitle + ".txt";
-    string borrowedBookFolder = "txt_files\\borrowed_books\\" + bookTitle + ".txt";
-
-    // File Handling: isInCurrentPath
-    if (ifstream(currentPath)) {
-
-        // File Handling: isMovable
-        if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
-            cerr << "\nERROR | could_not_move_file";
-            return;
-        }
-
-        ifstream bookFileReader(borrowedBookFolder); // File Reader
-
-        // Read Content
-        while (getline(bookFileReader, line)) {
-            currentLines.push_back(line); // Store Content
-        }
-
-        bookFileReader.close(); // Close File Reader
-
-        currentLines[lineNumber - 1] = "Availability: X"; // Set Availability
-
-        ofstream bookFileWriter(borrowedBookFolder); // File Writer
-
-        // Display Content
-        for (const auto& modifiedLine : currentLines) {
-            bookFileWriter << modifiedLine << "\n";
-        }
-
-        bookFileWriter.close(); // Close File Writer
-
-        cout << "\nSuccessfully borrowed: " << bookTitle;
-        borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN); // Add to Borrow History
-    }
-
-        // Error Handling: borrowedBook
-        else {
-            cerr << "\nERROR | book_is_currently_borrowed";
-        }
-}
-
-// >> Return Book [8]
-void returnBook() {
-    string bookTitle, bookISBN, line;
-    int lineNumber = 16;
-    bool bookExists = false, invalidReturn = false;
-    vector<string> currentLines;
-
-    cout << "\n===+==+==+== iSort ==+==+==+===";
-    cout << "\n| -Library-Management-System- |";
-    cout << "\n-_-_-_-_-[RETURN BOOK]-_-_-_-_-";
-
-    do { // Error Loop
-        // Prompt
-        cout << "\nBook Title: ";
-        getline(cin, bookTitle);
-
-        // Input Handling: Exit Code
-        if (bookTitle == "/exit") {
-            exit(0);
-        }
-
-        // Error Handling: isEmpty
-        if (bookTitle.empty()) {
-            cerr << "\nERROR | blank_book_title";
-        }
-
-    } while (bookTitle.empty());
-
-    // Check if the book exists
-    for (const auto& book : bookList) {
-        if (book.first == bookTitle) {
-            bookExists = true;
-            bookISBN = *book.second;
-            break;
-        }
-    }
-
-    // Error Handling: Non-Existing Book
-    if (!bookExists) {
-        cerr << "\nERROR | book_does_not_exist";
-        return;
-    }
-
-    // Directories
-    string currentPath = "txt_files\\borrowed_books\\" + bookTitle + ".txt";
-    string textFileFolder = "txt_files\\" + bookTitle + ".txt";
-
-    // File Handling: isInCurrentPath
-    if (ifstream(currentPath)) {
-
-        // File Handling: isMovable
-        if (rename(currentPath.c_str(), textFileFolder.c_str()) != 0) {
-            cerr << "\nERROR | could_not_move_file";
-            return;
-        }
-
-        ifstream bookFileReader(textFileFolder); // File Reader
-
-        // Read Content
-        while (getline(bookFileReader, line)) {
-            currentLines.push_back(line); // Store Content
-        }
-
-        bookFileReader.close(); // Close File Reader
-
-        currentLines[lineNumber - 1] = "Availability: /"; // Set Availability
-
-        ofstream bookFileWriter(textFileFolder); // File Writer
-
-        // Display Content
-        for (const auto& modifiedLine : currentLines) {
-            bookFileWriter << modifiedLine << "\n";
-        }
-
-        bookFileWriter.close(); // Close File Writer
-
-        cout << "\nSuccessfully returned: " << bookTitle;
-        bookList[bookTitle] = make_unique<string>(bookISBN);
-        returnHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
+        cout << "\n===+==+==+== iSort ==+==+==+===";
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-[BORROW BOOK]-_-_-_-_-";
 
         // Display available books
         size_t counter = 1;
@@ -1243,13 +1099,174 @@ void returnBook() {
             cout << "\n" << counter << ". " << book.first << " [" << *book.second << "]";
             counter++;
         }
+
+        do { // Error Handling
+            cout << "\nBook Title: ";
+            getline(cin, bookTitle);
+
+            // Input Handling: Exit Code
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
+
+            // Error Handling: isEmpty
+            if (bookTitle.empty()) {
+                cerr << "\nERROR | blank_book_title";
+            }
+
+        } while (bookTitle.empty());
+
+        // Check if the book exists
+        for (const auto& book : bookList) {
+            if (book.first == bookTitle) {
+                bookExists = true;
+                bookISBN = *book.second;
+                break;
+            }
+        }
+
+        // Error Handling: Book Non-Existing
+        if (!bookExists) {
+            cerr << "\nERROR | book_does_not_exist";
+            return;
+        }
+
+        // Directories
+        string currentPath = "txt_files\\" + bookTitle + ".txt";
+        string borrowedBookFolder = "txt_files\\borrowed_books\\" + bookTitle + ".txt";
+
+        // File Handling: isInCurrentPath
+        if (ifstream(currentPath)) {
+
+            // File Handling: isMovable
+            if (rename(currentPath.c_str(), borrowedBookFolder.c_str()) != 0) {
+                cerr << "\nERROR | could_not_move_file";
+                return;
+            }
+
+            ifstream bookFileReader(borrowedBookFolder); // File Reader
+
+            // Read Content
+            while (getline(bookFileReader, line)) {
+                currentLines.push_back(line); // Store Content
+            }
+
+            bookFileReader.close(); // Close File Reader
+
+            currentLines[lineNumber - 1] = "Availability: X"; // Set Availability
+
+            ofstream bookFileWriter(borrowedBookFolder); // File Writer
+
+            // Display Content
+            for (const auto& modifiedLine : currentLines) {
+                bookFileWriter << modifiedLine << "\n";
+            }
+
+            bookFileWriter.close(); // Close File Writer
+
+            cout << "\nSuccessfully borrowed: " << bookTitle;
+            borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN); // Add to Borrow History
+        }
+
+            // Error Handling: borrowedBook
+            else {
+                cerr << "\nERROR | book_is_currently_borrowed";
+            }
     }
 
-    // Error Handling: isAlreadyReturned
-    else {
-        cerr << "\nERROR | book_already_returned";
+    // >> Return Book [8]
+    void returnBook() {
+        string bookTitle, bookISBN, line;
+        int lineNumber = 16;
+        bool bookExists = false, invalidReturn = false;
+        vector<string> currentLines;
+
+        cout << "\n===+==+==+== iSort ==+==+==+===";
+        cout << "\n| -Library-Management-System- |";
+        cout << "\n-_-_-_-_-[RETURN BOOK]-_-_-_-_-";
+
+        do { // Error Loop
+            // Prompt
+            cout << "\nBook Title: ";
+            getline(cin, bookTitle);
+
+            // Input Handling: Exit Code
+            if (bookTitle == "/exit") {
+                exit(0);
+            }
+
+            // Error Handling: isEmpty
+            if (bookTitle.empty()) {
+                cerr << "\nERROR | blank_book_title";
+            }
+
+        } while (bookTitle.empty());
+
+        // Check if the book exists
+        for (const auto& book : bookList) {
+            if (book.first == bookTitle) {
+                bookExists = true;
+                bookISBN = *book.second;
+                break;
+            }
+        }
+
+        // Error Handling: Non-Existing Book
+        if (!bookExists) {
+            cerr << "\nERROR | book_does_not_exist";
+            return;
+        }
+
+        // Directories
+        string currentPath = "txt_files\\borrowed_books\\" + bookTitle + ".txt";
+        string textFileFolder = "txt_files\\" + bookTitle + ".txt";
+
+        // File Handling: isInCurrentPath
+        if (ifstream(currentPath)) {
+
+            // File Handling: isMovable
+            if (rename(currentPath.c_str(), textFileFolder.c_str()) != 0) {
+                cerr << "\nERROR | could_not_move_file";
+                return;
+            }
+
+            ifstream bookFileReader(textFileFolder); // File Reader
+
+            // Read Content
+            while (getline(bookFileReader, line)) {
+                currentLines.push_back(line); // Store Content
+            }
+
+            bookFileReader.close(); // Close File Reader
+
+            currentLines[lineNumber - 1] = "Availability: /"; // Set Availability
+
+            ofstream bookFileWriter(textFileFolder); // File Writer
+
+            // Display Content
+            for (const auto& modifiedLine : currentLines) {
+                bookFileWriter << modifiedLine << "\n";
+            }
+
+            bookFileWriter.close(); // Close File Writer
+
+            cout << "\nSuccessfully returned: " << bookTitle;
+            bookList[bookTitle] = make_unique<string>(bookISBN);
+            returnHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
+
+            // Display available books
+            size_t counter = 1;
+            for (const auto& book : bookList) {
+                cout << "\n" << counter << ". " << book.first << " [" << *book.second << "]";
+                counter++;
+            }
+        }
+
+        // Error Handling: isAlreadyReturned
+        else {
+            cerr << "\nERROR | book_already_returned";
+        }
     }
-}
 
     // >> Search Book [9]
     void searchBook() {
