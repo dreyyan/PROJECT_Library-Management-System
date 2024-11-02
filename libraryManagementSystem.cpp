@@ -277,6 +277,18 @@ public:
                         }
                     }
 
+                    int currentYear = timeFormat.tm_year + 1900; // Current Year
+                    int currentMonth = timeFormat.tm_mon + 1; // Current Month
+                    int currentDay = timeFormat.tm_mday; // Current Dat
+
+                    int year = (inputPublicationDate[6] - '0') * 1000 + (inputPublicationDate[7] - '0') * 100 + (inputPublicationDate[8] - '0') * 10 + (inputPublicationDate[9] - '0');
+
+                    // Error Handling: Invalid Year
+                    if (year < 1900 || year > currentYear) {
+                        isValidPublicationDate = false;
+                        cerr << "\nERROR | invalid_year\n";
+                    }
+
                     // Error Handling: Invalid Month
                     int month = (inputPublicationDate[0] - '0') * 10 + (inputPublicationDate[1] - '0');
                     if (month < 1 || month > 12) {
@@ -289,6 +301,14 @@ public:
                     if (day < 1 || day > 31) { // Simplistic day check
                         isValidPublicationDate = false;
                         cerr << "\nERROR | invalid_day\n";
+                    }
+
+                    // Error Handling: Current Month & Year
+                    if (year == currentYear && month == currentMonth) {
+                        if (day > currentDay) {
+                            isValidPublicationDate = false;
+                            cerr << "\nERROR | invalid_day_for_current_month\n";
+                        }
                     }
                 }
             }
