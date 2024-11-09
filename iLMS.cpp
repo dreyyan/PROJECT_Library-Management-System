@@ -840,14 +840,18 @@ public:
 
             // Validate Information: Accessable File
             if (fileFound) {
+                system("cls");
                 string filePath = getFilePath(bookTitle);
                 cout << "\nBASIC INFORMATION |";
                 bookReference.validateBasicInformation(bookAuthor, bookGenre, bookISBN);
+                system("cls");
                 cout << "\nPUBLICATION INFORMATION |";
                 bookReference.validatePublicationDetails(bookPublicationDate, bookEdition);
+                system("cls");
                 cout << "\nPHYSICAL INFORMATION |";
                 bookReference.validatePhysicalDetails(bookLanguage, bookPageCount, bookContent);
                 // Input Validated Information to Book File
+                system("cls");
                 inputValidatedInformation(filePath, bookTitle, bookAuthor, bookGenre, bookISBN, bookPublicationDate, bookEdition, bookLanguage, bookContent, bookPageCount, bookAvailability);
                 readBookfile(bookTitle);
                 bookList[bookTitle] = make_unique<string>(bookISBN);
@@ -894,6 +898,7 @@ public:
 
         // Display Current Content
         if (bookFileReader) {
+            system("cls");
             cout << "\nBook File Found!\n\n";
             cout << "File Name: " << bookTitle << ".txt";
             cout << "\n-------------------------CONTENT-------------------------\n";
@@ -921,6 +926,7 @@ public:
         } while (cin.fail() || lineNumber < 1 || lineNumber > currentLines.size());
 
             // Prompt New Content
+            system("cls");
             cout << "\nCurrent Content: " << currentLines[lineNumber - 1];
             cin.ignore();
             cout << "\nChange Content(Line " << lineNumber << "): ";
@@ -934,6 +940,7 @@ public:
 
             // Close Book
             bookFileWriter.close();
+            system("cls");
             cout << "\nLine " << lineNumber << " updated successfully!";
         }
 
@@ -980,6 +987,7 @@ public:
 
         // Read File: Accessable File
         if (bookFileReader) {
+            system("cls");
             cout << "\nBook File Found!\n\n";
             cout << "\nFile Name: " << bookTitle << ".txt";
             cout << "\n-------------------------CONTENT-------------------------|\n";
@@ -1032,6 +1040,7 @@ public:
 
         } while (bookTitle.empty() || isspace(bookTitle[0]));
 
+        system("cls");
         filePath = getFilePath(bookTitle); // Getter
         if (remove(filePath.c_str()) == 0) { // Converts File Path to C-Style String, Removes File Using File Path, Returns 0 or 1
             cout << "\nBook File Deleted!\n\n";
@@ -1079,6 +1088,7 @@ public:
 
                 // Input Handling: Create Book File
                 if (choice == 'y' || choice == 'Y') {
+                    system("cls");
                     createBookfile();
                 }
 
@@ -1184,6 +1194,7 @@ public:
 
             bookFileWriter.close(); // Close File Writer
 
+            system("cls");
             cout << "\nSuccessfully borrowed: " << bookTitle;
             borrowHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN); // Add to Borrow History
         }
@@ -1270,6 +1281,7 @@ public:
 
             bookFileWriter.close(); // Close File Writer
 
+            system("cls");
             cout << "\nSuccessfully returned: " << bookTitle;
             bookList[bookTitle] = make_unique<string>(bookISBN);
             returnHistory[make_unique<string>(bookTitle)] = make_unique<string>(bookISBN);
@@ -1329,6 +1341,7 @@ public:
 
                 if (bookExists) {
                     int choice;
+                    system("cls");
                     cout << "\nBook '" << bookTitle << "' found!" << " >> ISBN[" << *book.second << "]"; // Display Book File
 
                     do { // Error Loop
@@ -1357,6 +1370,7 @@ public:
 
                         // Read File: Accessable File
                         if (bookFileReader) {
+                            system("cls");
                             cout << "\nFile Name: " << bookTitle << ".txt";
                             cout << "\n-------------------------CONTENT-------------------------|\n";
 
@@ -1639,6 +1653,7 @@ public:
 
         } while (!isValidPassword);
 
+        system("cls");
         // Register Using Login Credentials
         loginCredentials[username] = password;
 
@@ -1658,6 +1673,7 @@ public:
             cin >> registerMenuChoice;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            system("cls");
 
             // Input Handling: 1(Display Login Menu)
             if (registerMenuChoice == 1) {
@@ -1730,6 +1746,7 @@ public:
 
         } while (!correctPassword);
 
+        system("cls");
         cout << "\nLogin Successful!";
         displayLibraryMenu();
     }
@@ -1750,6 +1767,7 @@ public:
             cin >> loginMenuChoice;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            system("cls");
 
             // Input Handling: loginMenuChoice
             switch(loginMenuChoice) {
@@ -1760,7 +1778,7 @@ public:
                     displayRegisterMenu();
                 break;
                 case 3:
-                    cout << "\nexiting program...";
+                    cout << "exiting program...\n";
                     exit(0);
                 break;
                 default:
@@ -1804,50 +1822,64 @@ public:
             // Input Handling: Choice
             switch (choice) {
             case 1:
+                system("cls");
                 libraryReference.createBookfile();
                 break;
             case 2:
+                system("cls");
                 libraryReference.inputBookInformation();
                 break;
             case 3:
+                system("cls");
                 libraryReference.readBookfile();
                 break;
             case 4:
+                system("cls");
                 libraryReference.updateBookInformation();
                 break;
             case 5:
+                system("cls");
                 libraryReference.deleteBookfile();
                 break;
             case 6:
+                system("cls");
                 libraryReference.showBooklist();
                 break;
             case 7:
+                system("cls");
                 libraryReference.borrowBook();
                 break;
             case 8:
+                system("cls");
                 libraryReference.returnBook();
                 break;
             case 9:
+                system("cls");
                 libraryReference.searchBook();
                 break;
             case 10:
+                system("cls");
                 libraryReference.printBorrowHistory();
                 break;
             case 11:
+                system("cls");
                 libraryReference.printReturnHistory();
                 break;
             case 12:
+                system("cls");
                 libraryReference.displayTableOfContents();
                 break;
             case 13:
+                system("cls");
                 displayMenu();
                 break;
             default:
+                system("cls");
                 cout << "\nInvalid Input. Please try again.";
                 break;
             }
             backToMenu();
-
+            system("cls");
         } while (true);
     }
 
